@@ -1,7 +1,7 @@
 article .container .row img {
   max-width: 100% !important;
   height: auto;
-  display: inline-block;
+  display: block;
   text-align: center;
 }
 article .container .row .video-container {
