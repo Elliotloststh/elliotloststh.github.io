@@ -1,0 +1,336 @@
+<!DOCTYPE html>
+<html lang="zn-CN">
+
+<!-- Head tag -->
+<head>
+
+    <meta charset="utf-8"/>
+    <meta http-equiv="X-UA-Compatible" content="IE=edge"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1"/>
+
+    <!--Description-->
+
+    
+
+    
+        <meta name="description" content="上一篇：Sentinel源码阅读（一）
+本文主要包括Sentinel的熔断降级部分。
+熔断降级前文说了，每一种规则都是责任链中的一个节点，对应不同的实现类，熔断降级的类就是DegradeSlot，位于com.alibaba.csp.sentinel.slots.block.degrade包下。目录结"/>
+    
+
+    <!--Author-->
+    
+        <meta name="author" content="Gary Yuan"/>
+    
+
+    <!--Open Graph Title-->
+    
+        <meta property="og:title" content="Sentinel源码阅读（二）"/>
+    
+
+    <!--Open Graph Description-->
+    
+        <meta property="og:description" content="上一篇：Sentinel源码阅读（一）
+本文主要包括Sentinel的熔断降级部分。
+熔断降级前文说了，每一种规则都是责任链中的一个节点，对应不同的实现类，熔断降级的类就是DegradeSlot，位于com.alibaba.csp.sentinel.slots.block.degrade包下。目录结"/>
+    
+
+    <!--Open Graph Site Name-->
+        <meta property="og:site_name" content="Gary&#39;s Blog"/>
+
+    <!--Type page-->
+    
+        <meta property="og:type" content="article"/>
+    
+
+    <!--Page Cover-->
+    
+    
+        <meta property="og:image" content="http://myblackboxrecorder.comimg/bg.jpg"/>
+    
+
+        <meta name="twitter:card" content="summary_large_image"/>
+
+    
+
+    
+        <meta name="twitter:image" content="http://myblackboxrecorder.comimg/bg.jpg"/>
+    
+
+    <!-- Title -->
+    
+    <title>Sentinel源码阅读（二） - Gary&#39;s Blog</title>
+
+    <!-- Bootstrap Core CSS -->
+    <link href="//maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css" rel="stylesheet"/>
+
+    <!-- Custom CSS -->
+    
+<link rel="stylesheet" href="/css/style.css">
+
+
+    <!-- Custom Fonts -->
+    <link href="//maxcdn.bootstrapcdn.com/font-awesome/4.6.3/css/font-awesome.min.css" rel="stylesheet" type="text/css"/>
+    <link href="//fonts.googleapis.com/css?family=Lora:400,700,400italic,700italic" rel="stylesheet" type="text/css"/>
+    <link href="//fonts.googleapis.com/css?family=Open+Sans:300italic,400italic,600italic,700italic,800italic,400,300,600,700,800" rel="stylesheet" type="text/css"/>
+
+    <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
+    <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+    <!--[if lt IE 9]>
+    <script src="//oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+    <script src="//oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
+    <![endif]-->
+
+    <!-- Gallery -->
+    <link href="/css/featherlight.min.css" type="text/css" rel="stylesheet"/>
+
+    <!-- Google Analytics -->
+    
+
+
+    <!-- favicon -->
+    
+    <link rel="icon" href="https://myblackboxrecorder.oss-cn-hangzhou.aliyuncs.com/a049a-jooxb-001.ico"/>
+    
+
+<meta name="generator" content="Hexo 5.4.0"></head>
+
+
+<body>
+
+    <!-- Menu -->
+    <!-- Navigation -->
+<nav class="navbar navbar-default navbar-custom navbar-fixed-top">
+    <div class="container-fluid">
+        <!-- Brand and toggle get grouped for better mobile display -->
+        <div class="navbar-header page-scroll">
+            <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+            <a class="navbar-brand" href="/">Gary's Blog</a>
+        </div>
+
+        <!-- Collect the nav links, forms, and other content for toggling -->
+        <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+            <ul class="nav navbar-nav navbar-right">
+                
+                    <li>
+                        <a href="/">
+                            
+                                Home
+                            
+                        </a>
+                    </li>
+                
+                    <li>
+                        <a href="/archives">
+                            
+                                Archives
+                            
+                        </a>
+                    </li>
+                
+                    <li>
+                        <a href="/tags">
+                            
+                                Tags
+                            
+                        </a>
+                    </li>
+                
+                    <li>
+                        <a href="/about">
+                            
+                                about
+                            
+                        </a>
+                    </li>
+                
+            </ul>
+        </div>
+        <!-- /.navbar-collapse -->
+    </div>
+    <!-- /.container -->
+</nav>
+
+    <!-- Main Content -->
+    <!-- Page Header -->
+<!-- Set your background image for this header in your post front-matter: cover -->
+
+<header class="intro-header" style="background-image: url('/img/bg.jpg')">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1">
+                <div class="post-heading">
+                    <h1>Sentinel源码阅读（二）</h1>
+                    
+                    <span class="meta">
+                        <!-- Date and Author -->
+                        
+                        
+                            2021-09-07
+                        
+                    </span>
+                </div>
+            </div>
+        </div>
+    </div>
+</header>
+
+<!-- Post Content -->
+<article>
+    <div class="container">
+        <div class="row">
+
+            <!-- Tags and categories -->
+           
+                <div class="col-lg-4 col-lg-offset-2 col-md-5 col-md-offset-1 post-tags">
+                    
+                        
+
+
+<a href="/tags/技术/">#技术</a> <a href="/tags/Java/">#Java</a> <a href="/tags/Sentinel/">#Sentinel</a>
+
+
+                    
+                </div>
+                <div class="col-lg-4 col-md-5 post-categories">
+                    
+                </div>
+            
+
+            <!-- Gallery -->
+            
+
+            <!-- Post Main Content -->
+            <div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1">
+                <p>上一篇：<a href="https://myblackboxrecorder.com/2021/08/24/Sentinel%E6%BA%90%E7%A0%81%E9%98%85%E8%AF%BB%EF%BC%88%E4%B8%80%EF%BC%89/">Sentinel源码阅读（一）</a></p>
+<p>本文主要包括Sentinel的熔断降级部分。</p>
+<h3 id="熔断降级"><a href="#熔断降级" class="headerlink" title="熔断降级"></a>熔断降级</h3><p>前文说了，每一种规则都是责任链中的一个节点，对应不同的实现类，熔断降级的类就是DegradeSlot，位于com.alibaba.csp.sentinel.slots.block.degrade包下。目录结构如下：</p>
+<div align=center>
+<img src="1.png"/>
+</div>
+
+<p>除了DegradeSlot，还有</p>
+<ul>
+<li>CircuitBreaker：断路器，并有异常数断路器ExceptionCircuitBreaker与RT断路器ResponseTimeCircuitBreaker</li>
+<li>DegradeException：BlockException的子类，降级抛出的是这个异常类</li>
+<li>DegradeRule：降级规则</li>
+</ul>
+<p>DegradeSlot的entry方法首先执行performChecking方法，核心逻辑都在这里。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@Override</span></span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">entry</span><span class="params">(Context context, ResourceWrapper resourceWrapper, DefaultNode node, <span class="keyword">int</span> count,</span></span></span><br><span class="line"><span class="params"><span class="function">                  <span class="keyword">boolean</span> prioritized, Object... args)</span> <span class="keyword">throws</span> Throwable </span>&#123;</span><br><span class="line">    performChecking(context, resourceWrapper);</span><br><span class="line"></span><br><span class="line">    fireEntry(context, resourceWrapper, node, count, prioritized, args);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">performChecking</span><span class="params">(Context context, ResourceWrapper r)</span> <span class="keyword">throws</span> BlockException </span>&#123;</span><br><span class="line">    List&lt;CircuitBreaker&gt; circuitBreakers = DegradeRuleManager.getCircuitBreakers(r.getName());</span><br><span class="line">    <span class="keyword">if</span> (circuitBreakers == <span class="keyword">null</span> || circuitBreakers.isEmpty()) &#123;</span><br><span class="line">        <span class="keyword">return</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">for</span> (CircuitBreaker cb : circuitBreakers) &#123;</span><br><span class="line">        <span class="keyword">if</span> (!cb.tryPass(context)) &#123;</span><br><span class="line">            <span class="keyword">throw</span> <span class="keyword">new</span> DegradeException(cb.getRule().getLimitApp(), cb.getRule());</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>第一步是根据资源标识获取断路器list。DegradeRuleManager.getCircuitBreakers是直接从其内部一个map get资源标识映射的断路器的。而这个map的初始化在DegradeRuleManager.RulePropertyListener::reloadFrom方法中</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">private</span> <span class="keyword">synchronized</span> <span class="keyword">void</span> <span class="title">reloadFrom</span><span class="params">(List&lt;DegradeRule&gt; list)</span> </span>&#123;</span><br><span class="line">    Map&lt;String, List&lt;CircuitBreaker&gt;&gt; cbs = buildCircuitBreakers(list);</span><br><span class="line">    Map&lt;String, Set&lt;DegradeRule&gt;&gt; rm = <span class="keyword">new</span> HashMap&lt;&gt;(cbs.size());</span><br><span class="line"></span><br><span class="line">    <span class="keyword">for</span> (Map.Entry&lt;String, List&lt;CircuitBreaker&gt;&gt; e : cbs.entrySet()) &#123;</span><br><span class="line">        <span class="keyword">assert</span> e.getValue() != <span class="keyword">null</span> &amp;&amp; !e.getValue().isEmpty();</span><br><span class="line"></span><br><span class="line">        Set&lt;DegradeRule&gt; rules = <span class="keyword">new</span> HashSet&lt;&gt;(e.getValue().size());</span><br><span class="line">        <span class="keyword">for</span> (CircuitBreaker cb : e.getValue()) &#123;</span><br><span class="line">            rules.add(cb.getRule());</span><br><span class="line">        &#125;</span><br><span class="line">        rm.put(e.getKey(), rules);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    DegradeRuleManager.circuitBreakers = cbs;</span><br><span class="line">    DegradeRuleManager.ruleMap = rm;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>DegradeRule是从配置中取的（或者手动构造）不再赘述，这个方法读取DegradeRule列表，并将其转化为CircuitBreaker。转换的方法比较简单，见DegradeRuleManager::newCircuitBreakerFrom。</p>
+<p>然后实际上就是遍历断路器列表，执行其tryPass方法判断调用是否能通过，不通过则抛出DegradeException异常。因此下面重点看下断路器CircuitBreaker类。</p>
+<p>Sentinel的断路器借鉴了一篇经典文章：<a target="_blank" rel="noopener" href="https://martinfowler.com/bliki/CircuitBreaker.html">https://martinfowler.com/bliki/CircuitBreaker.html</a></p>
+<p>总的来说，断路器有三种状态：</p>
+<ul>
+<li>open：开启状态（即熔断状态），直接返回false，如果开启时间超过了熔断时间，则转为半开状态</li>
+<li>half-open：半开状态，这种状态下会允许下一个请求通过，并对其直接进行异常或RT的校验，而不考虑阈值，如果异常，则继续转为开启状态，如果正常，说明链路恢复了，转为关闭状态。</li>
+<li>close：关闭状态，返回true</li>
+</ul>
+<div align=center>
+<img src="2.png"/>
+</div>
+
+<p>Sentinel的实现完全一致</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">boolean</span> <span class="title">tryPass</span><span class="params">(Context context)</span> </span>&#123;</span><br><span class="line">    <span class="comment">// Template implementation.</span></span><br><span class="line">    <span class="keyword">if</span> (currentState.get() == State.CLOSED) &#123;</span><br><span class="line">        <span class="keyword">return</span> <span class="keyword">true</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">if</span> (currentState.get() == State.OPEN) &#123;</span><br><span class="line">        <span class="comment">// For half-open state we allow a request for probing.</span></span><br><span class="line">        <span class="keyword">return</span> retryTimeoutArrived() &amp;&amp; fromOpenToHalfOpen(context);</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> <span class="keyword">false</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>Entry在exit时，会调用CircuitBreaker的onRequestComplete方法，取异常或RT，如果在半开状态，若有异常或RT过高，则继续转为开启，否则关闭。以ResponseTimeCircuitBreaker为例</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">onRequestComplete</span><span class="params">(Context context)</span> </span>&#123;</span><br><span class="line">    SlowRequestCounter counter = slidingCounter.currentWindow().value();</span><br><span class="line">    Entry entry = context.getCurEntry();</span><br><span class="line">    <span class="keyword">if</span> (entry == <span class="keyword">null</span>) &#123;</span><br><span class="line">        <span class="keyword">return</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">long</span> completeTime = entry.getCompleteTimestamp();</span><br><span class="line">    <span class="keyword">if</span> (completeTime &lt;= <span class="number">0</span>) &#123;</span><br><span class="line">        completeTime = TimeUtil.currentTimeMillis();</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">long</span> rt = completeTime - entry.getCreateTimestamp();</span><br><span class="line">    <span class="keyword">if</span> (rt &gt; maxAllowedRt) &#123;</span><br><span class="line">        counter.slowCount.add(<span class="number">1</span>);</span><br><span class="line">    &#125;</span><br><span class="line">    counter.totalCount.add(<span class="number">1</span>);</span><br><span class="line"></span><br><span class="line">    handleStateChangeWhenThresholdExceeded(rt);</span><br><span class="line">&#125;</span><br><span class="line"><span class="function"><span class="keyword">private</span> <span class="keyword">void</span> <span class="title">handleStateChangeWhenThresholdExceeded</span><span class="params">(<span class="keyword">long</span> rt)</span> </span>&#123;</span><br><span class="line">    <span class="keyword">if</span> (currentState.get() == State.OPEN) &#123;</span><br><span class="line">        <span class="keyword">return</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">    <span class="keyword">if</span> (currentState.get() == State.HALF_OPEN) &#123;</span><br><span class="line">        <span class="comment">// In detecting request</span></span><br><span class="line">        <span class="comment">// <span class="doctag">TODO:</span> improve logic for half-open recovery</span></span><br><span class="line">        <span class="keyword">if</span> (rt &gt; maxAllowedRt) &#123;</span><br><span class="line">            fromHalfOpenToOpen(<span class="number">1.0d</span>);</span><br><span class="line">        &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">            fromHalfOpenToClose();</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">return</span>;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    ...</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>最后再讲讲异常数断路器ExceptionCircuitBreaker与RT断路器ResponseTimeCircuitBreaker是如何工作的。</p>
+<p>不同断路器要实现的其实就是进行异常的统计，并在状态转换时，进行不同的操作。</p>
+<p>两者内部都内部维护了一个LeapArray：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line">public class ExceptionCircuitBreaker extends AbstractCircuitBreaker &#123;</span><br><span class="line"></span><br><span class="line">    private final int strategy;</span><br><span class="line">    private final int minRequestAmount;</span><br><span class="line">    private final double threshold;</span><br><span class="line"></span><br><span class="line">    private final LeapArray&lt;SimpleErrorCounter&gt; stat;</span><br><span class="line"></span><br><span class="line">    public ExceptionCircuitBreaker(DegradeRule rule) &#123;</span><br><span class="line">        this(rule, new SimpleErrorCounterLeapArray(1, rule.getStatIntervalMs()));</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    ExceptionCircuitBreaker(DegradeRule rule, LeapArray&lt;SimpleErrorCounter&gt; stat) &#123;</span><br><span class="line">        super(rule);</span><br><span class="line">        this.strategy = rule.getGrade();</span><br><span class="line">        boolean modeOk = strategy == DEGRADE_GRADE_EXCEPTION_RATIO || strategy == DEGRADE_GRADE_EXCEPTION_COUNT;</span><br><span class="line">        AssertUtil.isTrue(modeOk, &quot;rule strategy should be error-ratio or error-count&quot;);</span><br><span class="line">        AssertUtil.notNull(stat, &quot;stat cannot be null&quot;);</span><br><span class="line">        this.minRequestAmount = rule.getMinRequestAmount();</span><br><span class="line">        this.threshold = rule.getCount();</span><br><span class="line">        this.stat = stat;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>LeapArray是一个滑动窗口算法的实现。这个类在Sentinel许多地方都用到了来进行统计，下一节会讲到。每次请求结束时，都会进行统计，将总数与异常数并写入滑动窗口中。以此作为计算是否到达阈值的依据。区别只是判断异常的方式，ExceptionCircuitBreaker根据是否抛出Exception判断，ResponseTimeCircuitBreaker根据记录的RT是否超过阈值判断。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line">List&lt;SlowRequestCounter&gt; counters = slidingCounter.values();</span><br><span class="line"><span class="keyword">long</span> slowCount = <span class="number">0</span>;</span><br><span class="line"><span class="keyword">long</span> totalCount = <span class="number">0</span>;</span><br><span class="line"><span class="keyword">for</span> (SlowRequestCounter counter : counters) &#123;</span><br><span class="line">    slowCount += counter.slowCount.sum();</span><br><span class="line">    totalCount += counter.totalCount.sum();</span><br><span class="line">&#125;</span><br><span class="line"><span class="keyword">if</span> (totalCount &lt; minRequestAmount) &#123;</span><br><span class="line">    <span class="keyword">return</span>;</span><br><span class="line">&#125;</span><br><span class="line"><span class="keyword">double</span> currentRatio = slowCount * <span class="number">1.0d</span> / totalCount;</span><br><span class="line"><span class="keyword">if</span> (currentRatio &gt; maxSlowRequestRatio) &#123;</span><br><span class="line">    transformToOpen(currentRatio);</span><br><span class="line">&#125;</span><br><span class="line"><span class="keyword">if</span> (Double.compare(currentRatio, maxSlowRequestRatio) == <span class="number">0</span> &amp;&amp;</span><br><span class="line">        Double.compare(maxSlowRequestRatio, SLOW_REQUEST_RATIO_MAX_VALUE) == <span class="number">0</span>) &#123;</span><br><span class="line">    transformToOpen(currentRatio);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="滑动窗口-LeapArray"><a href="#滑动窗口-LeapArray" class="headerlink" title="滑动窗口-LeapArray"></a>滑动窗口-LeapArray</h3><p>由于在熔断降级这里首先看到这个类，那就在本文讲掉了。</p>
+<p>TODO</p>
+
+
+                
+            </div>
+
+            <!-- Comments -->
+            
+                <div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1">
+                    
+
+
+                </div>
+            
+        </div>
+    </div>
+</article>
+
+    <!-- Footer -->
+    <hr />
+
+<!-- Footer -->
+<footer>
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1">
+                <ul class="list-inline text-center">
+                    
+
+                    
+
+                    
+                        <li>
+                            <a href="https://github.com/Elliotloststh" target="_blank">
+                                <span class="fa-stack fa-lg">
+                                    <i class="fa fa-circle fa-stack-2x"></i>
+                                    <i class="fa fa-github fa-stack-1x fa-inverse"></i>
+                                </span>
+                            </a>
+                        </li>
+                    
+
+                    
+
+                    
+                        <li>
+                            <a href="mailto:elliotloststh@gmail.com" target="_blank">
+                                <span class="fa-stack fa-lg">
+                                    <i class="fa fa-circle fa-stack-2x"></i>
+                                    <i class="fa fa-envelope-o fa-stack-1x fa-inverse"></i>
+                                </span>
+                            </a>
+                        </li>
+                    
+                </ul>
+                <p class="copyright text-muted">&copy; 2021 Gary Yuan<br></p>
+            </div>
+        </div>
+    </div>
+</footer>
+
+
+    <!-- After footer scripts -->
+    
+<!-- jQuery -->
+<script src="//code.jquery.com/jquery-2.1.4.min.js"></script>
+
+<!-- Bootstrap -->
+<script src="//maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js"></script>
+
+<!-- Gallery -->
+<script src="/js/featherlight.min.js" type="text/javascript" charset="utf-8"></script>
+
+<!-- Disqus Comments -->
+
+
+
+</body>
+
+</html>
