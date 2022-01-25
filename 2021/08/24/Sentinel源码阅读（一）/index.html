@@ -190,7 +190,7 @@
                         
 
 
-<a href="/tags/技术/">#技术</a> <a href="/tags/Java/">#Java</a> <a href="/tags/Sentinel/">#Sentinel</a>
+<a href="/tags/Java/">#Java</a> <a href="/tags/技术/">#技术</a> <a href="/tags/Sentinel/">#Sentinel</a>
 
 
                     
@@ -264,7 +264,7 @@
 <figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">entry</span><span class="params">(Context context, ResourceWrapper resourceWrapper, Object t, <span class="keyword">int</span> count, <span class="keyword">boolean</span> prioritized, Object... args)</span> <span class="keyword">throws</span> Throwable </span>&#123;</span><br><span class="line">    first.transformEntry(context, resourceWrapper, t, count, prioritized, args);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 
 <p>就是从第一个节点开始执行责任。这个过程中就会进行规则的校验，比如降级的节点进行降级规则的校验。如果触发规则，则会抛出异常。至此，Sentinel的核心流程算是讲完了。</p>
-<h4 id="小结"><a href="#小结" class="headerlink" title="小结"></a>小结</h4><p>本文从最简单的case入手，分析了Sentinel保护资源的流程。Sentinel的源码个人认为还算比较易懂的，但对Sentinel源码的阅读尚未结束，如关键的数据统计算法、熔断降级限流隔离原理等，未完待续。</p>
+<h3 id="小结"><a href="#小结" class="headerlink" title="小结"></a>小结</h3><p>本文从最简单的case入手，分析了Sentinel保护资源的流程。Sentinel的源码个人认为还算比较易懂的，但对Sentinel源码的阅读尚未结束，如关键的数据统计算法、熔断降级限流隔离原理等，未完待续。</p>
 
 
                 
@@ -319,7 +319,7 @@
                         </li>
                     
                 </ul>
-                <p class="copyright text-muted">&copy; 2021 Gary Yuan<br></p>
+                <p class="copyright text-muted">&copy; 2022 Gary Yuan<br></p>
             </div>
         </div>
     </div>
