@@ -14,8 +14,8 @@
 
     
         <meta name="description" content="上一篇：Sentinel源码阅读（一）
-本文主要包括Sentinel的熔断降级部分。
-熔断降级前文说了，每一种规则都是责任链中的一个节点，对应不同的实现类，熔断降级的类就是DegradeSlot，位于com.alibaba.csp.sentinel.slots.block.degrade包下。目录结"/>
+本文主要包括Sentinel的熔断降级与滑动窗口算法部分。
+熔断降级前文说了，每一种规则都是责任链中的一个节点，对应不同的实现类，熔断降级的类就是DegradeSlot，位于com.alibaba.csp.sentinel.slots.block.degrad"/>
     
 
     <!--Author-->
@@ -31,8 +31,8 @@
     <!--Open Graph Description-->
     
         <meta property="og:description" content="上一篇：Sentinel源码阅读（一）
-本文主要包括Sentinel的熔断降级部分。
-熔断降级前文说了，每一种规则都是责任链中的一个节点，对应不同的实现类，熔断降级的类就是DegradeSlot，位于com.alibaba.csp.sentinel.slots.block.degrade包下。目录结"/>
+本文主要包括Sentinel的熔断降级与滑动窗口算法部分。
+熔断降级前文说了，每一种规则都是责任链中的一个节点，对应不同的实现类，熔断降级的类就是DegradeSlot，位于com.alibaba.csp.sentinel.slots.block.degrad"/>
     
 
     <!--Open Graph Site Name-->
@@ -208,7 +208,7 @@
             <!-- Post Main Content -->
             <div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1">
                 <p>上一篇：<a href="https://myblackboxrecorder.com/2021/08/24/Sentinel%E6%BA%90%E7%A0%81%E9%98%85%E8%AF%BB%EF%BC%88%E4%B8%80%EF%BC%89/">Sentinel源码阅读（一）</a></p>
-<p>本文主要包括Sentinel的熔断降级部分。</p>
+<p>本文主要包括Sentinel的熔断降级与滑动窗口算法部分。</p>
 <h3 id="熔断降级"><a href="#熔断降级" class="headerlink" title="熔断降级"></a>熔断降级</h3><p>前文说了，每一种规则都是责任链中的一个节点，对应不同的实现类，熔断降级的类就是DegradeSlot，位于com.alibaba.csp.sentinel.slots.block.degrade包下。目录结构如下：</p>
 <div align=center>
 <img src="1.png"/>
