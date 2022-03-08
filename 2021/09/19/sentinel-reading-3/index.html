@@ -13,6 +13,11 @@
     
 
     
+        <meta name="description" content="前文：
+Sentinel源码阅读（一）
+Sentinel源码阅读（二）
+本来第三篇想写限流部分，但我意识到不论熔断还是限流等等都是建立在基础的数据统计之上，而这部分我还并没有详细的阅读，我的理解是建立在我已经拿到数据的基础上。这可能会对Sentinel的认识造成偏差，另外数据统计也是其重要组成部分，"/>
+    
 
     <!--Author-->
     
@@ -21,10 +26,15 @@
 
     <!--Open Graph Title-->
     
-        <meta property="og:title" content="Gary&#39;s Blog"/>
+        <meta property="og:title" content="Sentinel源码阅读（三）"/>
     
 
     <!--Open Graph Description-->
+    
+        <meta property="og:description" content="前文：
+Sentinel源码阅读（一）
+Sentinel源码阅读（二）
+本来第三篇想写限流部分，但我意识到不论熔断还是限流等等都是建立在基础的数据统计之上，而这部分我还并没有详细的阅读，我的理解是建立在我已经拿到数据的基础上。这可能会对Sentinel的认识造成偏差，另外数据统计也是其重要组成部分，"/>
     
 
     <!--Open Graph Site Name-->
@@ -32,7 +42,7 @@
 
     <!--Type page-->
     
-        <meta property="og:type" content="website"/>
+        <meta property="og:type" content="article"/>
     
 
     <!--Page Cover-->
@@ -51,7 +61,7 @@
 
     <!-- Title -->
     
-    <title>Gary&#39;s Blog</title>
+    <title>Sentinel源码阅读（三） - Gary&#39;s Blog</title>
 
     <!-- Bootstrap Core CSS -->
     <link href="//maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css" rel="stylesheet"/>
@@ -151,141 +161,128 @@
 
     <!-- Main Content -->
     <!-- Page Header -->
-<!-- Set your background image for this header in the theme's configuration: index_cover -->
+<!-- Set your background image for this header in your post front-matter: cover -->
+
 <header class="intro-header" style="background-image: url('/img/bg.jpg')">
     <div class="container">
         <div class="row">
             <div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1">
-                <div class="site-heading">
-                    <h1>Gary's Blog</h1>
-                    <hr class="small">
-                    <span class="subheading">Carpe Diem</span>
+                <div class="post-heading">
+                    <h1>Sentinel源码阅读（三）</h1>
+                    
+                    <span class="meta">
+                        <!-- Date and Author -->
+                        
+                        
+                            2021-09-19
+                        
+                    </span>
                 </div>
             </div>
         </div>
     </div>
 </header>
 
-<!-- Main Content -->
-<div class="container">
-    <div class="row">
-        <div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1">
-            
-                <div class="post-preview">
-    <a href="/2022/02/01/second_black_box/">
-        <h2 class="post-title">
-            新年祝词
-        </h2>
-        
-    </a>
-    <p class="post-meta">
-        <!-- Date and Author -->
-        
-        2022-02-01
-    </p>
-</div>
-<hr>
-            
-                <div class="post-preview">
-    <a href="/2022/01/31/be-professional/">
-        <h2 class="post-title">
-            如何从职场小白蜕变为职场精英
-        </h2>
-        
-    </a>
-    <p class="post-meta">
-        <!-- Date and Author -->
-        
-        2022-01-31
-    </p>
-</div>
-<hr>
-            
-                <div class="post-preview">
-    <a href="/2021/12/21/solve_problem_use_bitmap/">
-        <h2 class="post-title">
-            用BitMap巧妙地解决难题
-        </h2>
-        
-    </a>
-    <p class="post-meta">
-        <!-- Date and Author -->
-        
-        2021-12-21
-    </p>
-</div>
-<hr>
-            
-                <div class="post-preview">
-    <a href="/2021/09/19/sentinel-reading-3/">
-        <h2 class="post-title">
-            Sentinel源码阅读（三）
-        </h2>
-        
-    </a>
-    <p class="post-meta">
-        <!-- Date and Author -->
-        
-        2021-09-19
-    </p>
-</div>
-<hr>
-            
-                <div class="post-preview">
-    <a href="/2021/09/07/Sentinel_reading_2/">
-        <h2 class="post-title">
-            Sentinel源码阅读（二）
-        </h2>
-        
-    </a>
-    <p class="post-meta">
-        <!-- Date and Author -->
-        
-        2021-09-07
-    </p>
-</div>
-<hr>
-            
-                <div class="post-preview">
-    <a href="/2021/08/24/Sentinel_reading_1/">
-        <h2 class="post-title">
-            Sentinel源码阅读（一）
-        </h2>
-        
-    </a>
-    <p class="post-meta">
-        <!-- Date and Author -->
-        
-        2021-08-24
-    </p>
-</div>
-<hr>
-            
-                <div class="post-preview">
-    <a href="/2021/06/18/first_black_box/">
-        <h2 class="post-title">
-            第一个黑匣子
-        </h2>
-        
-    </a>
-    <p class="post-meta">
-        <!-- Date and Author -->
-        
-        2021-06-18
-    </p>
-</div>
-<hr>
+<!-- Post Content -->
+<article>
+    <div class="container">
+        <div class="row">
+
+            <!-- Tags and categories -->
+           
+                <div class="col-lg-4 col-lg-offset-2 col-md-5 col-md-offset-1 post-tags">
+                    
+                        
+
+
+<a href="/tags/技术/">#技术</a> <a href="/tags/Java/">#Java</a> <a href="/tags/Sentinel/">#Sentinel</a>
+
+
+                    
+                </div>
+                <div class="col-lg-4 col-md-5 post-categories">
+                    
+                </div>
             
 
-            <ul class="pager">
-    
-    
+            <!-- Gallery -->
+            
+
+            <!-- Post Main Content -->
+            <div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1">
+                <p>前文：</p>
+<p><a href="https://myblackboxrecorder.com/2021/08/24/Sentinel_reading_1/">Sentinel源码阅读（一）</a></p>
+<p><a href="https://myblackboxrecorder.com/2021/09/07/Sentinel_reading_2/">Sentinel源码阅读（二）</a></p>
+<p>本来第三篇想写限流部分，但我意识到不论熔断还是限流等等都是建立在基础的数据统计之上，而这部分我还并没有详细的阅读，我的理解是建立在我已经拿到数据的基础上。这可能会对Sentinel的认识造成偏差，另外数据统计也是其重要组成部分，因此我决定先解析数据统计模块。</p>
+<p>在第一篇中，我们提到了Sentinel的所有责任链节点：</p>
+<ul>
+<li>com.alibaba.csp.sentinel.slots.nodeselector.NodeSelectorSlot</li>
+<li>com.alibaba.csp.sentinel.slots.clusterbuilder.ClusterBuilderSlot</li>
+<li>com.alibaba.csp.sentinel.slots.logger.LogSlot</li>
+<li>com.alibaba.csp.sentinel.slots.statistic.StatisticSlot</li>
+<li>com.alibaba.csp.sentinel.slots.block.authority.AuthoritySlot</li>
+<li>com.alibaba.csp.sentinel.slots.system.SystemSlot</li>
+<li>com.alibaba.csp.sentinel.slots.block.flow.FlowSlot</li>
+<li>com.alibaba.csp.sentinel.slots.block.degrade.DegradeSlot</li>
 </ul>
+<p>除去用于日志模块的LogSlot，最前三个Slot：NodeSelectorSlot、ClusterBuilderSlot与StatisticSlot，就是本文所要分析的部分。</p>
+<p>不过在分析Slot前，我们先补充一下必要的概念。</p>
+<h3 id="Matric"><a href="#Matric" class="headerlink" title="Matric"></a>Matric</h3><p>表示指标，记录了被保护资源的基础统计信息（监控埋点）。</p>
+<p>Matric中记录的信息包括：</p>
+<ul>
+<li></li>
+</ul>
+<p>Matric唯一的实现类为ArrayMatric。</p>
+<h3 id="Node"><a href="#Node" class="headerlink" title="Node"></a>Node</h3><p>Node的概念在Sentinel中很常见，第一个NodeSelectorSlot也与之有关，Node是一个接口，官方文档对其进行了定性。</p>
+<blockquote>
+<p>Holds real-time statistics for resources.</p>
+</blockquote>
+<p>其就是一个承载了实时统计数据的接口。类图如下：</p>
+<div align=center>
+<img src="Node.png"/>
+</div>
+
+
+
+<h3 id="NodeSelectorSlot"><a href="#NodeSelectorSlot" class="headerlink" title="NodeSelectorSlot"></a>NodeSelectorSlot</h3><p>NodeSelectorSlot类上写了很多注释，从注释我们可以明白这个类的作用，并通过阅读源码进一步理解。</p>
+
+
+                
+            </div>
+
+            <!-- Comments -->
+            
+                <div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1">
+                    <div id="gitalk-container"></div>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.css">
+<script src="https://cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.min.js"></script>
+<script>
+var gitalk = new Gitalk({
+  clientID: 'bfdcccffd65a099e0dd6',
+  clientSecret: '0e63b1d8f5fa09b4cf84c05ba3a03c993f9b0a5f',
+  repo: 'elliotloststh.github.io',
+  owner: 'elliotloststh',
+  admin: ['elliotloststh'],
+  id: location.pathname,      // Ensure uniqueness and length less than 50
+  distractionFreeMode: false  // Facebook-like distraction free mode
+})
+
+gitalk.render('gitalk-container')
+</script>
+
+
+
+
+
+
+
+
+
+                </div>
+            
         </div>
     </div>
-</div>
-
-
+</article>
 
     <!-- Footer -->
     <hr />
