@@ -1,0 +1,490 @@
+<!DOCTYPE html>
+<html lang="zn-CN">
+
+<!-- Head tag -->
+<head>
+
+    <meta charset="utf-8"/>
+    <meta http-equiv="X-UA-Compatible" content="IE=edge"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1"/>
+
+    <!--Description-->
+
+    
+
+    
+        <meta name="description" content="前文：
+Sentinel源码阅读（一）
+Sentinel源码阅读（二）
+Sentinel源码阅读（三）
+本文将是该系列的最后一篇，主要解析限流部分原理，并将另一些未讲到的如系统规则、黑白名单补足。
+限流限流的责任链节点为FlowSlot，代码结构如下：
+
+
+
+
+重要的类有：
+
+FlowSlot：责任"/>
+    
+
+    <!--Author-->
+    
+        <meta name="author" content="Gary Yuan"/>
+    
+
+    <!--Open Graph Title-->
+    
+        <meta property="og:title" content="Sentinel源码阅读（四）"/>
+    
+
+    <!--Open Graph Description-->
+    
+        <meta property="og:description" content="前文：
+Sentinel源码阅读（一）
+Sentinel源码阅读（二）
+Sentinel源码阅读（三）
+本文将是该系列的最后一篇，主要解析限流部分原理，并将另一些未讲到的如系统规则、黑白名单补足。
+限流限流的责任链节点为FlowSlot，代码结构如下：
+
+
+
+
+重要的类有：
+
+FlowSlot：责任"/>
+    
+
+    <!--Open Graph Site Name-->
+        <meta property="og:site_name" content="Gary&#39;s Blog"/>
+
+    <!--Type page-->
+    
+        <meta property="og:type" content="article"/>
+    
+
+    <!--Page Cover-->
+    
+    
+        <meta property="og:image" content="http://myblackboxrecorder.comimg/bg.jpg"/>
+    
+
+        <meta name="twitter:card" content="summary_large_image"/>
+
+    
+
+    
+        <meta name="twitter:image" content="http://myblackboxrecorder.comimg/bg.jpg"/>
+    
+
+    <!-- Title -->
+    
+    <title>Sentinel源码阅读（四） - Gary&#39;s Blog</title>
+
+    <!-- Bootstrap Core CSS -->
+    <link href="//maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css" rel="stylesheet"/>
+
+    <!-- Custom CSS -->
+    
+<link rel="stylesheet" href="/css/style.css">
+
+
+    <!-- Custom Fonts -->
+    <link href="//maxcdn.bootstrapcdn.com/font-awesome/4.6.3/css/font-awesome.min.css" rel="stylesheet" type="text/css"/>
+    <link href="//fonts.googleapis.com/css?family=Lora:400,700,400italic,700italic" rel="stylesheet" type="text/css"/>
+    <link href="//fonts.googleapis.com/css?family=Open+Sans:300italic,400italic,600italic,700italic,800italic,400,300,600,700,800" rel="stylesheet" type="text/css"/>
+
+    <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
+    <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+    <!--[if lt IE 9]>
+    <script src="//oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+    <script src="//oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
+    <![endif]-->
+    
+
+    <!-- Gallery -->
+    <link href="/css/featherlight.min.css" type="text/css" rel="stylesheet"/>
+
+    <!-- Google Analytics -->
+    
+
+
+    <!-- favicon -->
+    
+    <link rel="icon" href="https://myblackboxrecorder.oss-cn-hangzhou.aliyuncs.com/a049a-jooxb-001.ico"/>
+    
+
+<meta name="generator" content="Hexo 5.4.0"></head>
+
+
+<body>
+
+    <!-- Menu -->
+    <!-- Navigation -->
+<nav class="navbar navbar-default navbar-custom navbar-fixed-top">
+    <div class="container-fluid">
+        <!-- Brand and toggle get grouped for better mobile display -->
+        <div class="navbar-header page-scroll">
+            <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+            <a class="navbar-brand" href="/">Gary's Blog</a>
+        </div>
+
+        <!-- Collect the nav links, forms, and other content for toggling -->
+        <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+            <ul class="nav navbar-nav navbar-right">
+                
+                    <li>
+                        <a href="/">
+                            
+                                Home
+                            
+                        </a>
+                    </li>
+                
+                    <li>
+                        <a href="/archives">
+                            
+                                Archives
+                            
+                        </a>
+                    </li>
+                
+                    <li>
+                        <a href="/tags">
+                            
+                                Tags
+                            
+                        </a>
+                    </li>
+                
+                    <li>
+                        <a href="/about">
+                            
+                                about
+                            
+                        </a>
+                    </li>
+                
+            </ul>
+        </div>
+        <!-- /.navbar-collapse -->
+    </div>
+    <!-- /.container -->
+</nav>
+
+    <!-- Main Content -->
+    <!-- Page Header -->
+<!-- Set your background image for this header in your post front-matter: cover -->
+
+<header class="intro-header" style="background-image: url('/img/bg.jpg')">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1">
+                <div class="post-heading">
+                    <h1>Sentinel源码阅读（四）</h1>
+                    
+                    <span class="meta">
+                        <!-- Date and Author -->
+                        
+                        
+                            2021-10-03
+                        
+                    </span>
+                </div>
+            </div>
+        </div>
+    </div>
+</header>
+
+<!-- Post Content -->
+<article>
+    <div class="container">
+        <div class="row">
+
+            <!-- Tags and categories -->
+           
+                <div class="col-lg-4 col-lg-offset-2 col-md-5 col-md-offset-1 post-tags">
+                    
+                        
+
+
+<a href="/tags/技术/">#技术</a> <a href="/tags/Java/">#Java</a> <a href="/tags/Sentinel/">#Sentinel</a>
+
+
+                    
+                </div>
+                <div class="col-lg-4 col-md-5 post-categories">
+                    
+                </div>
+            
+
+            <!-- Gallery -->
+            
+
+            <!-- Post Main Content -->
+            <div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1">
+                <p>前文：</p>
+<p><a href="https://myblackboxrecorder.com/2021/08/24/Sentinel_reading_1/">Sentinel源码阅读（一）</a></p>
+<p><a href="https://myblackboxrecorder.com/2021/09/07/Sentinel_reading_2/">Sentinel源码阅读（二）</a></p>
+<p><a href="https://myblackboxrecorder.com/2021/09/19/sentinel-reading-3/">Sentinel源码阅读（三）</a></p>
+<p>本文将是该系列的最后一篇，主要解析限流部分原理，并将另一些未讲到的如系统规则、黑白名单补足。</p>
+<h2 id="限流"><a href="#限流" class="headerlink" title="限流"></a>限流</h2><p>限流的责任链节点为FlowSlot，代码结构如下：</p>
+<div align=center>
+<img src="structure.png"/>
+</div>
+
+<p>重要的类有：</p>
+<ul>
+<li>FlowSlot：责任链节点</li>
+<li>FlowRuleChecker：实际限流的执行者</li>
+<li>TrafficShapingController：限流器，其有多种实现，在controller包下</li>
+</ul>
+<p>FlowSlot内逻辑非常简单，就是调用了FlowRuleChecker::checkFlow方法。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">checkFlow</span><span class="params">(Function&lt;String, Collection&lt;FlowRule&gt;&gt; ruleProvider, ResourceWrapper resource,</span></span></span><br><span class="line"><span class="params"><span class="function">                      Context context, DefaultNode node, <span class="keyword">int</span> count, <span class="keyword">boolean</span> prioritized)</span> <span class="keyword">throws</span> BlockException </span>&#123;</span><br><span class="line">    <span class="keyword">if</span> (ruleProvider == <span class="keyword">null</span> || resource == <span class="keyword">null</span>) &#123;</span><br><span class="line">        <span class="keyword">return</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    Collection&lt;FlowRule&gt; rules = ruleProvider.apply(resource.getName());</span><br><span class="line">    <span class="keyword">if</span> (rules != <span class="keyword">null</span>) &#123;</span><br><span class="line">        <span class="keyword">for</span> (FlowRule rule : rules) &#123;</span><br><span class="line">            <span class="keyword">if</span> (!canPassCheck(rule, context, node, count, prioritized)) &#123;</span><br><span class="line">                <span class="keyword">throw</span> <span class="keyword">new</span> FlowException(rule.getLimitApp(), rule);</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>会对每种FlowRule，执行canPassCheck检查是否可以通过，如果不能，抛出FlowException，这是一种BlockException。</p>
+<p>canPassCheck中有两个分支，分别为单机限流passLocalCheck与集群限流passLocalCheck，我们本次只分析常用的单机限流。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">boolean</span> <span class="title">passLocalCheck</span><span class="params">(FlowRule rule, Context context, DefaultNode node, <span class="keyword">int</span> acquireCount,</span></span></span><br><span class="line"><span class="params"><span class="function">                                      <span class="keyword">boolean</span> prioritized)</span> </span>&#123;</span><br><span class="line">    Node selectedNode = selectNodeByRequesterAndStrategy(rule, context, node);</span><br><span class="line">    <span class="keyword">if</span> (selectedNode == <span class="keyword">null</span>) &#123;</span><br><span class="line">        <span class="keyword">return</span> <span class="keyword">true</span>;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> rule.getRater().canPass(selectedNode, acquireCount, prioritized);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>首先根据调用方与流控模式拿到相关的Node。</p>
+<p>流控模式包含三种：</p>
+<ul>
+<li>直接流控模式（DIRECT）：最简单的模式，对当前资源达到条件后直接限流。</li>
+<li>关联流控模式（RELATE）：定义一个关联接口，当关联接口达到限流条件，当前资源会限流。</li>
+<li>链路流控模式（CHAIN）：针对来源进行区分，定义一个入口资源，如果当前资源达到限流条件，只会对该入口进行限流。</li>
+</ul>
+<p>selectNodeByRequesterAndStrategy方法中的逻辑为</p>
+<ul>
+<li>直接流控模式下<ul>
+<li>如果配置了限流上游为default（全部），返回当前的clusterNode</li>
+<li>如果配置了且与当前调用来源匹配，返回当前来源的originNode</li>
+<li>都不匹配，返回null，不需要限流</li>
+</ul>
+</li>
+<li>关联流控模式下<ul>
+<li>返回关联资源的clusterNode</li>
+</ul>
+</li>
+<li>链路模式下<ul>
+<li>如果context中的来源与配置匹配，返回当前Node</li>
+<li>不匹配，返回null，不需要限流</li>
+</ul>
+</li>
+</ul>
+<p>最后是执行限流规则中配置的限流器的canPass方法，我们接下来重点分析下这个方法。</p>
+<h3 id="限流器"><a href="#限流器" class="headerlink" title="限流器"></a>限流器</h3><p>限流器就是TrafficShapingController，我们直接看它的几种实现类，对应几种流控效果，类图如下：</p>
+<div align=center>
+<img src="TrafficShapingController.png"/>
+</div>
+
+<ul>
+<li>DefaultController：快速失败</li>
+<li>WarmUpController：预热</li>
+<li>RateLimiterController：匀速排队</li>
+<li>WarmUpRateLimiterController：预热+匀速排队</li>
+</ul>
+<p>我们逐个分析</p>
+<h4 id="DefaultController"><a href="#DefaultController" class="headerlink" title="DefaultController"></a>DefaultController</h4><p>DefaultController使用了令牌桶算法（或者说思想）。借用了网上的图片：</p>
+<div align=center>
+<img src="token1.png"/>
+</div>
+
+<p>令牌以一个恒定的速率添加到桶中，当有新的数据包进来时，需要检查桶是否包含足够的令牌。如果不符合，则会按照各种拒绝策略进行处理。</p>
+<p>在DefaultController中，统计的时间窗口是1s，恒定的速率就是配置的上限QPS值，当前qps就是已使用的令牌。计算如果剩余令牌足够就放行，否则，如果设置了允许occupied_pass，会先借用未来的时间窗口，如果都不行则会直接拒绝。借用相关逻辑在StatisticNode，逻辑就是去计算要到下一个空闲bucket所需时间（借用则会占用，下次不能再借），再与超时时间进行比较。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">boolean</span> <span class="title">canPass</span><span class="params">(Node node, <span class="keyword">int</span> acquireCount, <span class="keyword">boolean</span> prioritized)</span> </span>&#123;</span><br><span class="line">    <span class="comment">// 计算已使用的令牌，如果是qps则计算passQps，否则计算线程数</span></span><br><span class="line">    <span class="keyword">int</span> curCount = avgUsedTokens(node);</span><br><span class="line">    <span class="comment">// 如果当前请求加入会超出令牌上限</span></span><br><span class="line">    <span class="keyword">if</span> (curCount + acquireCount &gt; count) &#123;</span><br><span class="line">        <span class="comment">// 如果当前为高优先级业务，且指标为QPS</span></span><br><span class="line">        <span class="keyword">if</span> (prioritized &amp;&amp; grade == RuleConstant.FLOW_GRADE_QPS) &#123;</span><br><span class="line">            <span class="keyword">long</span> currentTime;</span><br><span class="line">            <span class="keyword">long</span> waitInMs;</span><br><span class="line">            currentTime = TimeUtil.currentTimeMillis();</span><br><span class="line">            <span class="comment">// 尝试借用未来时间窗口，获取一个等待时间</span></span><br><span class="line">            waitInMs = node.tryOccupyNext(currentTime, acquireCount, count);</span><br><span class="line">            <span class="keyword">if</span> (waitInMs &lt; OccupyTimeoutProperty.getOccupyTimeout()) &#123;</span><br><span class="line">                node.addWaitingRequest(currentTime + waitInMs, acquireCount);</span><br><span class="line">                node.addOccupiedPass(acquireCount);</span><br><span class="line">                <span class="comment">// sleep至未来时间窗口</span></span><br><span class="line">                sleep(waitInMs);</span><br><span class="line"></span><br><span class="line">                <span class="comment">// PriorityWaitException indicates that the request will pass after waiting for &#123;@link @waitInMs&#125;.</span></span><br><span class="line">                <span class="keyword">throw</span> <span class="keyword">new</span> PriorityWaitException(waitInMs);</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">return</span> <span class="keyword">false</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> <span class="keyword">true</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h4 id="WarmUpController"><a href="#WarmUpController" class="headerlink" title="WarmUpController"></a>WarmUpController</h4><p>当服务未达到一个稳定状态时，一般即仍在初始化时（如建立数据库连接，java static变量懒加载），服务的承载能力可能会远低于稳定状态，即使相对少的请求，仍会拖垮服务，所以我们需要预热（WarmUp），让处理请求的数量缓缓增多。</p>
+<p>官网上的图，允许通过的qps随时间的变化：</p>
+<div align=center>
+<img src="slope.png"/>
+</div>
+
+<p><strong>一开始，系统流量很少，突然流量开始飙增，飙增到一个冷启动阈值时，触发预热，流量缓缓增加，直到达到限流阈值。</strong></p>
+<p>下面我们通过看源码，了解具体实现。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">WarmUpController</span> <span class="keyword">implements</span> <span class="title">TrafficShapingController</span> </span>&#123;</span><br><span class="line">    <span class="keyword">protected</span> <span class="keyword">double</span> count;</span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">int</span> coldFactor;</span><br><span class="line">    <span class="keyword">protected</span> <span class="keyword">int</span> warningToken = <span class="number">0</span>;</span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">int</span> maxToken;</span><br><span class="line">    <span class="keyword">protected</span> <span class="keyword">double</span> slope;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">protected</span> AtomicLong storedTokens = <span class="keyword">new</span> AtomicLong(<span class="number">0</span>);</span><br><span class="line">    <span class="keyword">protected</span> AtomicLong lastFilledTime = <span class="keyword">new</span> AtomicLong(<span class="number">0</span>);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> * 初始化函数，构造时调用</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"><span class="function"><span class="keyword">private</span> <span class="keyword">void</span> <span class="title">construct</span><span class="params">(<span class="keyword">double</span> count, <span class="keyword">int</span> warmUpPeriodInSec, <span class="keyword">int</span> coldFactor)</span> </span>&#123;</span><br><span class="line">    <span class="keyword">if</span> (coldFactor &lt;= <span class="number">1</span>) &#123;</span><br><span class="line">        <span class="keyword">throw</span> <span class="keyword">new</span> IllegalArgumentException(<span class="string">&quot;Cold factor should be larger than 1&quot;</span>);</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">this</span>.count = count;</span><br><span class="line">    <span class="keyword">this</span>.coldFactor = coldFactor;</span><br><span class="line">    warningToken = (<span class="keyword">int</span>)(warmUpPeriodInSec * count) / (coldFactor - <span class="number">1</span>);</span><br><span class="line">    maxToken = warningToken + (<span class="keyword">int</span>)(<span class="number">2</span> * warmUpPeriodInSec * count / (<span class="number">1.0</span> + coldFactor));</span><br><span class="line">    slope = (coldFactor - <span class="number">1.0</span>) / count / (maxToken - warningToken);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>Sentinel的预热算法基于的基本逻辑是（实际代码实现方式有区别）：</p>
+<ul>
+<li>假设系统每秒能承载x数量的请求</li>
+<li>每一秒，都会有x个令牌被添加到桶中，直至桶的上限</li>
+<li>每个请求到来时，会使用一个令牌</li>
+<li>桶中存在的令牌越多，说明系统的利用率越低</li>
+<li>当桶中（令牌/上限）达到一个阈值，视为系统进入饱和状态</li>
+</ul>
+<p>我们再简单分析成员变量：</p>
+<ul>
+<li>count：配置的限流阈值，也是桶的上限</li>
+<li>warmUpPeriodInSec：配置的冷启动需要的时间，单位秒</li>
+<li>coldFactor：冷启动因子，默认为3，主要用在算法中，见下文，由coldFactor可以得到触发冷启动的阈值threshold为count/coldFactor</li>
+<li>warningToken：一个警戒线，是冷启动阈值的实现。如果令牌数大于这个值，说明需要预热或还在预热期</li>
+<li>maxToken：桶中token数上限</li>
+<li>slope：斜率，即qps曲线当前时间的斜率</li>
+<li>storedTokens：桶存储的token数</li>
+<li>lastFilledTime：上一次进入限流器的时间，用于判断时间过去了多久，以添加对应数量的令牌到桶中</li>
+</ul>
+<p>一个问题是，桶的上限、警戒线与斜率为什么是这么算的？</p>
+<p>这坨公式和含义啃了好久，还需要参考Guava的一个实现（因为Sentinel的限流算法基于Guava理论）：</p>
+<p><a target="_blank" rel="noopener" href="https://github.com/google/guava/blob/master/guava/src/com/google/common/util/concurrent/SmoothRateLimiter.java">Guava 实现</a></p>
+<blockquote>
+<p> Sentinel’s “warm-up” implementation is based on the Guava’s algorithm.However, Guava’s implementation focuses on adjusting the request interval, which is similar to leaky bucket. Sentinel pays more attention to controlling the count of incoming requests per second without calculating its interval, which resembles token bucket algorithm.</p>
+</blockquote>
+<p>注释中提到，Guava聚焦于调整请求的间隔，从而控制流量。为了便于理解Sentinel的实现，我们先看Guava的实现</p>
+<pre>
+         ^ throttling
+         |
+   cold  +                  /
+interval |                 /.
+         |                / .
+         |               /  .   
+         |              /   .     
+         |             /    .
+         |            /     .
+         |           /      .
+  stable +----------/  WARM .
+interval |          .   UP  .
+         |          . PERIOD.
+         |          .       .
+       0 +----------+-------+--------------→ storedTokens
+         0   warningTokens maxTokens
+</pre>
+
+<p>一个坐标图，变量名与sentinel尽量做了匹配。其中横坐标是桶中的令牌数，纵坐标是从桶中取出令牌需要的时间间隔。为什么有时间间隔？Guava的理念是，假设qps上限为100，那么稳定状态下的时间间隔就应该是10ms。Guava通过如让线程sleep的方式，来调整时间间隔，从而达到预热缓慢让qps上升的效果，从而实现流量的控制。</p>
+<p>其中stable interval表示稳定状态下的时间间隔，即100ms。cold interval表示系统完全在“冷”的状态，即桶为满状态下的时间间隔。两个状态的令牌数分别为warningTokens与maxTokens。而在实际系统中，预热是从右往左进行的，从cold状态逐步进入stable状态。中间的这段过程则是预热的过程。cold interval/stable interval是Guava中的coldFactor，默认也为3。</p>
+<p>Guava定义预热的过程是线性的，那么从maxTokens到warningTokens是一个梯形，<strong>这个梯形的面积就是预热的时间WarmUpPeriod</strong>，如果你不理解，可以想象下微积分，是同理的（带入值，划分成长方体），如果还不理解，可以评论区留言。</p>
+<p>那么有公式1:</p>
+<script type="math/tex; mode=display">
+warmUpPeriod = 0.5 * stableInterval * (1 + coldFactor) * (maxTokens - warningTokens)</script><p>因为Sentinel没有时间间隔一说，更关注数量。稳定状态下，每秒能取count个令牌。而Guava中1/stableInterval就是是1秒除以稳定状态下取一个令牌需要的时间，也就是稳定状态下1秒内能取到的令牌数，两者是相等的。等式1:</p>
+<script type="math/tex; mode=display">
+count = 1/stableInterval</script><p>然后则有以下公式</p>
+<script type="math/tex; mode=display">
+maxTokens = warningTokens + 2 * warmUpPeriod / stableInterval / (1 + coldFactor)</script><script type="math/tex; mode=display">
+maxTokens = warningTokens + 2 * warmUpPeriod * count / (1 + coldFactor)</script><p>这样，上面maxTokens的计算公式就推导出来了。接下来是warningTokens。</p>
+<p>可以看出来这个坐标图的形状是与warningTokens相关的，在两个interval与warmUpPeriod固定的情况下，warningTokens值的变化，会引起maxTokens的变化，进而引起整个图形的变化。那么很明显它不是被一个计算的值，而是一个约定的值。以什么规则约定的？</p>
+<p>其实，coldFactor除了是coldInterval/stableInterval的值以外，还有一个规则，即从maxTokens到0这个过程中，期望在stable状态下的时间是总时间的 1/coldFactor。stable状态下的时间是图形左边的矩形面积：stableInterval * warningTokens，梯形面积已经知道，那么有公式：</p>
+<script type="math/tex; mode=display">
+stableInterval * warningTokens + warmUpPeriod = coldFactor * stableInterval * warningTokens</script><script type="math/tex; mode=display">
+warningTokens = warmUpPeriod / stableInterval / (coldFactor - 1)</script><p>由于上面的等式1，则有</p>
+<script type="math/tex; mode=display">
+warningTokens = warmUpPeriod * count / (coldFactor - 1)</script><p>这样warningTokens的公式也推导出来了。</p>
+<p>至于斜率slope，指的也是坐标图中预热过程斜坡的斜率，比较好计算：</p>
+<script type="math/tex; mode=display">
+slope=(coldInterval - stableInterval) / (maxTokens - warningTokens)</script><script type="math/tex; mode=display">
+slope=stableInterval * (coldFactor - 1) / (maxTokens - warningTokens)</script><script type="math/tex; mode=display">
+slope = (coldFactor - 1) / count / (maxTokens - warningTokens)</script><p>slope公式也推导完成。这部分的要点要去了解Guava的算法基础，否则，很难去理解这几个参数的含义。</p>
+
+
+                
+            </div>
+
+            <!-- Comments -->
+            
+                <div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1">
+                    <div id="gitalk-container"></div>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.css">
+<script src="https://cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.min.js"></script>
+<script>
+var gitalk = new Gitalk({
+  clientID: 'bfdcccffd65a099e0dd6',
+  clientSecret: '0e63b1d8f5fa09b4cf84c05ba3a03c993f9b0a5f',
+  repo: 'elliotloststh.github.io',
+  owner: 'elliotloststh',
+  admin: ['elliotloststh'],
+  id: location.pathname,      // Ensure uniqueness and length less than 50
+  distractionFreeMode: false  // Facebook-like distraction free mode
+})
+
+gitalk.render('gitalk-container')
+</script>
+
+
+
+
+
+
+
+
+
+                </div>
+            
+        </div>
+    </div>
+</article>
+
+    <!-- Footer -->
+    <hr />
+
+<!-- Footer -->
+<footer>
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1">
+                <ul class="list-inline text-center">
+                    
+
+                    
+
+                    
+                        <li>
+                            <a href="https://github.com/Elliotloststh" target="_blank">
+                                <span class="fa-stack fa-lg">
+                                    <i class="fa fa-circle fa-stack-2x"></i>
+                                    <i class="fa fa-github fa-stack-1x fa-inverse"></i>
+                                </span>
+                            </a>
+                        </li>
+                    
+
+                    
+
+                    
+                        <li>
+                            <a href="mailto:elliotloststh@gmail.com" target="_blank">
+                                <span class="fa-stack fa-lg">
+                                    <i class="fa fa-circle fa-stack-2x"></i>
+                                    <i class="fa fa-envelope-o fa-stack-1x fa-inverse"></i>
+                                </span>
+                            </a>
+                        </li>
+                    
+                </ul>
+                <p class="copyright text-muted">&copy; 2022 Gary Yuan<br></p>
+            </div>
+        </div>
+    </div>
+</footer>
+
+
+    <!-- After footer scripts -->
+    
+<!-- jQuery -->
+<script src="//code.jquery.com/jquery-2.1.4.min.js"></script>
+
+<!-- Bootstrap -->
+<script src="//maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js"></script>
+
+<!-- Gallery -->
+<script src="/js/featherlight.min.js" type="text/javascript" charset="utf-8"></script>
+
+<!-- Disqus Comments -->
+
+
+
+<script type="text/x-mathjax-config">
+    MathJax.Hub.Config({
+        tex2jax: {
+            inlineMath: [ ["$","$"], ["\\(","\\)"] ],
+            skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code'],
+            processEscapes: true
+        }
+    });
+    MathJax.Hub.Queue(function() {
+        var all = MathJax.Hub.getAllJax();
+        for (var i = 0; i < all.length; ++i)
+            all[i].SourceElement().parentNode.className += ' has-jax';
+    });
+</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-MML-AM_CHTML"></script>
+</body>
+
+</html>
