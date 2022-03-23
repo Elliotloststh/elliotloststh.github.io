@@ -319,7 +319,7 @@ FlowSlot：责任"/>
 <li>coldFactor：冷启动因子，默认为3，主要用在算法中，见下文，由coldFactor可以得到触发冷启动的阈值threshold为count/coldFactor</li>
 <li>warningToken：一个警戒线，是冷启动阈值的实现。如果令牌数大于这个值，说明需要预热或还在预热期</li>
 <li>maxToken：桶中token数上限</li>
-<li>slope：斜率，即qps曲线当前时间的斜率</li>
+<li>slope：斜率，见下文</li>
 <li>storedTokens：桶存储的token数</li>
 <li>lastFilledTime：上一次进入限流器的时间，用于判断时间过去了多久，以添加对应数量的令牌到桶中</li>
 </ul>
@@ -372,6 +372,35 @@ warningTokens = warmUpPeriod * count / (coldFactor - 1)</script><p>这样warning
 slope=(coldInterval - stableInterval) / (maxTokens - warningTokens)</script><script type="math/tex; mode=display">
 slope=stableInterval * (coldFactor - 1) / (maxTokens - warningTokens)</script><script type="math/tex; mode=display">
 slope = (coldFactor - 1) / count / (maxTokens - warningTokens)</script><p>slope公式也推导完成。这部分的要点要去了解Guava的算法基础，否则，很难去理解这几个参数的含义。</p>
+<p>接下来，我们继续看限流器中的细节。之前提到限流会调用限流器的canPass方法，与Guava相比，Sentinel调整流量速率的方式就是部分通过部分不通过，判断是否通过则要根据令牌桶了，如下。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">boolean</span> <span class="title">canPass</span><span class="params">(Node node, <span class="keyword">int</span> acquireCount, <span class="keyword">boolean</span> prioritized)</span> </span>&#123;</span><br><span class="line">    <span class="keyword">long</span> passQps = (<span class="keyword">long</span>) node.passQps();</span><br><span class="line">    <span class="keyword">long</span> previousQps = (<span class="keyword">long</span>) node.previousPassQps();</span><br><span class="line">    syncToken(previousQps);</span><br><span class="line">    <span class="comment">// 开始计算它的斜率</span></span><br><span class="line">    <span class="comment">// 如果进入了警戒线，开始调整他的qps</span></span><br><span class="line">    <span class="keyword">long</span> restToken = storedTokens.get();</span><br><span class="line">    <span class="keyword">if</span> (restToken &gt;= warningToken) &#123;</span><br><span class="line">        <span class="keyword">long</span> aboveToken = restToken - warningToken;</span><br><span class="line">        <span class="keyword">double</span> warningQps = Math.nextUp(<span class="number">1.0</span> / (aboveToken * slope + <span class="number">1.0</span> / count));</span><br><span class="line">        <span class="keyword">if</span> (passQps + acquireCount &lt;= warningQps) &#123;</span><br><span class="line">            <span class="keyword">return</span> <span class="keyword">true</span>;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">        <span class="keyword">if</span> (passQps + acquireCount &lt;= count) &#123;</span><br><span class="line">            <span class="keyword">return</span> <span class="keyword">true</span>;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> <span class="keyword">false</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>可以看到有个syncToken方法，这个方法是用来更新桶中的令牌数的，至于为什么传入的是前一秒的qps，因为每次请求令牌的计算实际是在下一次才需要去算的，所以sentinel选择同步令牌桶的时机为限流前，而不是每次请求结束后再去更新令牌桶。syncToken中的逻辑就是上面提到的“每秒往桶内添加count个令牌”，以及“拿走previousQps个令牌”（这里有个细节，只有 当令牌的消耗程度远远低于警戒线的时候，才会添加）。</p>
+<p>接下去判断当前桶内令牌数restTokens是否超过warningTokens，超过说明需要预热，否则说明已经在stable状态，直接按普通限流处理即可。当需要预热时，我们需要调整qps让他不超过当前计算出的warningQps。这个warningQps计算公式也要通过Guava那张坐标图理解。</p>
+<pre>
+         ^ throttling
+         |               restTokens
+   cold  +              .   /
+interval |              .  /.
+         |              . / .
+         |              ./  .   
+         |              /------------> interval    
+         |             /    .
+         |            /     .
+         |           /      .
+  stable +----------/  WARM .
+interval |          .   UP  .
+         |          . PERIOD.
+         |          .       .
+       0 +----------+-------+--------------→ storedTokens
+         0   warningTokens maxTokens
+</pre>
+
+<p>调整qps与调整时间间隔效果是一样的，他们的关系是warningQps = 1 / interval，当前处于的位置横坐标为restTokens，很明显，可以算出来纵坐标的interval为</p>
+<script type="math/tex; mode=display">
+interval = stableInterval + slope * (restTokens - warningTokens)</script><p>换算一下，代入一下代码的变量：</p>
+<script type="math/tex; mode=display">
+1/warningQps = 1 / count + slope * aboveTokens</script><script type="math/tex; mode=display">
+warningQps = 1 / (slope * aboveTokens + 1 / count)</script><p>与代码中一致。接下去的代码就好理解了，判断是否超过warningQps，是则限流，否则不限，放进来作为预热，缓慢增加qps。至此，WarmingUpController部分看完了。</p>
 
 
                 
