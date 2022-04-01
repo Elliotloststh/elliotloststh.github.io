@@ -15,7 +15,13 @@
     
         <meta name="description" content="作为ZJU软件工程的大好学子，在校期间肯定做过一大堆有趣（乱七八糟）的项目。其中大部分是课程项目，小部分是业余时间完成。此时此刻突然有感而发，想要锐评一波当年的项目，乐呵乐呵。权当欣赏（吐槽），莫上纲上线，也莫拿来做面试考察！
 
-图书管理系统地址：https://github.com/Elliotl"/>
+
+
+图书管理系统
+MiniSQL
+区块链溯源系统
+ZJU-WIKI
+J"/>
     
 
     <!--Author-->
@@ -32,7 +38,13 @@
     
         <meta property="og:description" content="作为ZJU软件工程的大好学子，在校期间肯定做过一大堆有趣（乱七八糟）的项目。其中大部分是课程项目，小部分是业余时间完成。此时此刻突然有感而发，想要锐评一波当年的项目，乐呵乐呵。权当欣赏（吐槽），莫上纲上线，也莫拿来做面试考察！
 
-图书管理系统地址：https://github.com/Elliotl"/>
+
+
+图书管理系统
+MiniSQL
+区块链溯源系统
+ZJU-WIKI
+J"/>
     
 
     <!--Open Graph Site Name-->
@@ -211,21 +223,34 @@
                 <blockquote>
 <p>作为ZJU软件工程的大好学子，在校期间肯定做过一大堆有趣（乱七八糟）的项目。其中大部分是课程项目，小部分是业余时间完成。此时此刻突然有感而发，想要锐评一波当年的项目，乐呵乐呵。权当欣赏（吐槽），莫上纲上线，也莫拿来做面试考察！</p>
 </blockquote>
-<h2 id="图书管理系统"><a href="#图书管理系统" class="headerlink" title="图书管理系统"></a>图书管理系统</h2><p>地址：<a target="_blank" rel="noopener" href="https://github.com/Elliotloststh/Library-Management">https://github.com/Elliotloststh/Library-Management</a></p>
+<!-- toc -->
+<ul>
+<li><a href="#图书管理系统">图书管理系统</a></li>
+<li><a href="#minisql">MiniSQL</a></li>
+<li><a href="#区块链溯源系统">区块链溯源系统</a></li>
+<li><a href="#zju-wiki">ZJU-WIKI</a></li>
+<li><a href="#jhplayer">JHPlayer</a></li>
+<li><a href="#zju-chatroom">ZJU-ChatRoom</a></li>
+<li><a href="#ninjamustdie">NinjaMustDie</a></li>
+<li><a href="#ar篮球">AR篮球</a></li>
+</ul>
+<!-- tocstop -->
+<hr>
+<h2><span id="图书管理系统">图书管理系统</span></h2><p>地址：<a target="_blank" rel="noopener" href="https://github.com/Elliotloststh/Library-Management">https://github.com/Elliotloststh/Library-Management</a></p>
 <p>是老掉牙的管理系统，但作为本人第一个大型（算是吧）课程项目，还是有必要康一康。</p>
 <p>这是数据库课程的期中作业（为啥数据库要做个管理系统？好吧只是为了让我们连下数据库玩玩）。当初摆在大伙面前的有两条路，一是做个web，而是做个本地软件，大二的我懵懂无知，选择了用Qt写一个本地软件，毕竟当时我只会用c++ 🤡。</p>
 <p>进入src目录，好家伙所有资源和代码都堆一起了，可以理解，方便嘛哈哈哈哈。</p>
 <p>所幸当时存了图片，还能看到界面的样子：</p>
-<div align=center>
-<img src="1.JPG"/>
+<div align="center">
+<img src="1.JPG">
 </div>
 
-<div align=center>
-<img src="2.JPG"/>
+<div align="center">
+<img src="2.JPG">
 </div>
 
 <p>不得不说，功能还是很完善的，不仅有图书入库，搜索图书，借还书功能，特喵居然还有借书证功能。这些数据可不是我写死的，是真的本地建了几张表，然后Qt-mysql模块连的。但是我最大的印象还是这个分页，因为我一直调整不好分页的样式，之后怎么解决的我忘了，总之折磨了我几天，让我下定决心不写前端！</p>
-<h2 id="MiniSQL"><a href="#MiniSQL" class="headerlink" title="MiniSQL"></a>MiniSQL</h2><p>地址：<a target="_blank" rel="noopener" href="https://github.com/Elliotloststh/minisql">https://github.com/Elliotloststh/minisql</a></p>
+<h2><span id="minisql">MiniSQL</span></h2><p>地址：<a target="_blank" rel="noopener" href="https://github.com/Elliotloststh/minisql">https://github.com/Elliotloststh/minisql</a></p>
 <p>这位更是重量级，是数据库课程的期末作业，从名称可以看出，是做一个小型的MySQL（含金量）。先别惊讶，当然这个项目离MySQL差的不只10086个十万八千里，原理也没有那么复杂。</p>
 <p>记得这个项目是五人小组协作的，分别对应：</p>
 <ul>
@@ -240,59 +265,59 @@
 <p>IndexManager的大致逻辑是：索引也是一个二进制文件，每次启动，都会根据其在内存构建一棵B+数，B+树存储来记录的位置与offset，然后用到索引的字段会走索引。</p>
 <p>其他我记不太清了，Interpreter与语法树有关，CategoryManager是单纯的管理，BufferManager涉及到FILE文件系统的交互。</p>
 <p>如果你是mac，地址中有可执行文件，可以尝试一下。</p>
-<div align=center>
-<img src="3.png"/>
+<div align="center">
+<img src="3.png">
 </div>
 
-<h2 id="区块链溯源系统"><a href="#区块链溯源系统" class="headerlink" title="区块链溯源系统"></a>区块链溯源系统</h2><p>地址：<a target="_blank" rel="noopener" href="https://github.com/Elliotloststh/SupplyChain">https://github.com/Elliotloststh/SupplyChain</a></p>
+<h2><span id="区块链溯源系统">区块链溯源系统</span></h2><p>地址：<a target="_blank" rel="noopener" href="https://github.com/Elliotloststh/SupplyChain">https://github.com/Elliotloststh/SupplyChain</a></p>
 <p>没想到哥们还写过区块链dapp，基于truffle，用solidity语言编写的。内容大致是一个商品信息录入与查询系统，关键是信息是存到区块链上的，所以无法更改，这也是当年区块链最大的噱头，不过这么多年过去了，区块链却还是一个用来炒的东西，现在火的什么web3，我也没看懂，不知道是不是又一轮噶韭菜。</p>
 <p>现在回想这些都不重要，我要是当年多买几个比特币，我现在就财富自由了，恨啊。</p>
-<h2 id="ZJU-WIKI"><a href="#ZJU-WIKI" class="headerlink" title="ZJU-WIKI"></a>ZJU-WIKI</h2><p>浙大百科（ZJUWiki）是我跟一个朋友在大二时候运营的一个网站，技术上很简单，基于MediaWiki，只需要改一些配置文件，就可以生成一个和维基百科差不多的网站，添加wiki、搜索wiki等功能都是自带的。我们租了一台阿里云服务器，运行在上面。</p>
+<h2><span id="zju-wiki">ZJU-WIKI</span></h2><p>浙大百科（ZJUWiki）是我跟一个朋友在大二时候运营的一个网站，技术上很简单，基于MediaWiki，只需要改一些配置文件，就可以生成一个和维基百科差不多的网站，添加wiki、搜索wiki等功能都是自带的。我们租了一台阿里云服务器，运行在上面。</p>
 <p>建立的初衷是面向浙大学生，对在浙学习生活的相关信息进行收集与解释的网站。主体目标是“向知之甚少的同学们提供对一些词汇/地点/流程的解释”。例如名词的解释，地点的解释。像很多同学刚入校不知道所谓纳米楼所谓bg是什么意思，zju-wiki会记录这些，因此它不但可以作为一个百科网站，也沉淀了浙大的很多底蕴。</p>
 <p>当然，想法是很美好的，现实是残酷的。作为两个理工男，运营工作成为了我们面前最大的难关。虽然我觉得我们做的尽力了，但结果不尽如人意。我们自己编写了接近200个词条，后面建立了编者群，期望人多力量大（或许这就是toC吧）。</p>
-<div align=center>
-<img src="4.jpg"/>
+<div align="center">
+<img src="4.jpg">
 </div>
 
 <p>以及各种规则流程</p>
-<div align=center>
-<img src="5.jpg"/>
+<div align="center">
+<img src="5.jpg">
 </div>
 
 <p>最后编者群有了36人，也有10条左右用户编写的词条，但绝大部分时间用户都在群里水群🤣，最终我们没有钱续费服务器，zju-wiki宣告倒闭。</p>
-<h2 id="JHPlayer"><a href="#JHPlayer" class="headerlink" title="JHPlayer"></a>JHPlayer</h2><p>地址：<a target="_blank" rel="noopener" href="https://github.com/Elliotloststh/JHPlayer">https://github.com/Elliotloststh/JHPlayer</a></p>
+<h2><span id="jhplayer">JHPlayer</span></h2><p>地址：<a target="_blank" rel="noopener" href="https://github.com/Elliotloststh/JHPlayer">https://github.com/Elliotloststh/JHPlayer</a></p>
 <p>这是Java课程作业，因为大三那年，各大音乐软件版权竞争激烈，时常有些歌网易有，qq没有，有些歌qq有，网易没有。于是我做了一个聚合qq、网易云、酷狗三大主流平台的播放器。技术上是个本地软件，UI是swing写的，mysql存储用户信息、歌曲收藏记录。可以在线搜索三大平台歌曲，收藏或下载，当然也支持播放。</p>
-<div align=center>
-<img src="6.png"/>
+<div align="center">
+<img src="6.png">
 </div>
 
 
 <p>媒体播放是用的一个开源库魔改的。搜索实际上类似爬虫，用关键词去调用三个平台的搜索接口，然后聚合到一起。至于拿歌曲的mp3文件也是类似，靠发现的规则去取media文件。这里面酷狗是最简单的，网易云是js加密的而且很复杂，我后面把加密的代码拷贝下来，用ScriptEngineManager在jvm跑js解密的。qq好像有反爬措施，有几率失败，好像当时也没有去管。</p>
-<h2 id="ZJU-ChatRoom"><a href="#ZJU-ChatRoom" class="headerlink" title="ZJU-ChatRoom"></a>ZJU-ChatRoom</h2><p>地址：<a target="_blank" rel="noopener" href="https://github.com/Elliotloststh/ZJU-ChatRoom">https://github.com/Elliotloststh/ZJU-ChatRoom</a></p>
+<h2><span id="zju-chatroom">ZJU-ChatRoom</span></h2><p>地址：<a target="_blank" rel="noopener" href="https://github.com/Elliotloststh/ZJU-ChatRoom">https://github.com/Elliotloststh/ZJU-ChatRoom</a></p>
 <p>为什么前缀都要带ZJU？因为这也是课程作业。用boost::asio网络库写的聊天室，包含客户端与服务端。还是本地软件，界面用qt写的（毕竟两个组员都不会写前端）。年少无知的我们，完全不知道有开源库这种东西，网络层的东西，像连接管理、协议设计都是用socket手写的，搞出的是个既像无状态服务器，又像websocket的怪东西，虽然写的略粗糙，但是能用！</p>
 <p>协议如下，一共12个字节</p>
 <figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">/*</span><br><span class="line">*   The lay out of header is like following:</span><br><span class="line">*   | protocol | extra message | encoding | content type | content length| time |</span><br><span class="line">*   Some illustration:</span><br><span class="line">*   1. protocol, specify that what the data is for.</span><br><span class="line">*   2. extra message, specify whether extra message exsists. Note this solt</span><br><span class="line">        do not store the extra message. If extra message exsists, the value</span><br><span class="line">        of it is set to the length of extra messge.</span><br><span class="line">*   3. encoding, specify the encoding the data uses</span><br><span class="line">*   4. content type, specify the content&#x27;s type, such as file, picture...</span><br><span class="line">*   5. content length, specify the length of the content. </span><br><span class="line">*   6. timestamp, which value represent the seconds from Jan.1, 1970 to now.</span><br><span class="line">*/</span><br></pre></td></tr></table></figure>
 <p>然后消息传递是一个block一个block传递的，在服务端组装成完整的消息。</p>
 <p>至于功能的话，账号管理、加好友、进聊天室、发消息收消息。细节不清楚了，记得服务端维护了client列表（ip+端口），也维护了聊天室id与在聊天室client的列表（是的，虽然有用户概念，但只用来登陆，完全靠client管理）。Qt我本地删掉已经跑不起来，看不了了，可惜。</p>
-<h2 id="NinjaMustDie"><a href="#NinjaMustDie" class="headerlink" title="NinjaMustDie"></a>NinjaMustDie</h2><p>地址：<a target="_blank" rel="noopener" href="https://github.com/Elliotloststh/NinjaMustDie">https://github.com/Elliotloststh/NinjaMustDie</a></p>
+<h2><span id="ninjamustdie">NinjaMustDie</span></h2><p>地址：<a target="_blank" rel="noopener" href="https://github.com/Elliotloststh/NinjaMustDie">https://github.com/Elliotloststh/NinjaMustDie</a></p>
 <p>简单的不能再简单的小工具，但是因为在当时的场景很有趣所以拿出来说。</p>
 <p>大三那年，和室友在玩一款手游，叫忍者必须死3，一款水墨风格战斗跑酷游戏。但这个游戏最大的重点是家族系统以及家族战系统，每周六周日家族之间大战，高手在众多家族成员的关注下进行1v1男人大战，也有团队战，3v3各种回合，总之家族的凝聚力因为这种模式变得无比强大。简直比现实朋友还亲近，当然后面也面基了很多人。值得一提最大成就，当时作为族长带领家族还在全国大赛拿到了第36名。</p>
-<div align=center>
-<img src="7.PNG"/>
+<div align="center">
+<img src="7.PNG">
 </div>
 
 <p>当时这游戏时不时的会放出兑换码兑换各种奖励，于是跟舍友做了一个领奖励工具，只要一个人输入兑换码，全家族的人都可以拿到奖励。后端是Spring，前端把官方的页面拷贝了下来，freemaker渲染。</p>
-<div align=center>
-<img src="8.png"/>
+<div align="center">
+<img src="8.png">
 </div>
 
 
 <p>时过境迁，当时1分钟99+的qq群已经没人说话，朋友们也全部弃坑，这个工具自然也不复存在，感概呀。</p>
-<h2 id="AR篮球"><a href="#AR篮球" class="headerlink" title="AR篮球"></a>AR篮球</h2><p>地址：<a target="_blank" rel="noopener" href="https://github.com/Elliotloststh/ARBasketball">https://github.com/Elliotloststh/ARBasketball</a></p>
+<h2><span id="ar篮球">AR篮球</span></h2><p>地址：<a target="_blank" rel="noopener" href="https://github.com/Elliotloststh/ARBasketball">https://github.com/Elliotloststh/ARBasketball</a></p>
 <p>大三下，大家都在实习，结果有一门ios程序设计还要搞个大作业，大无语。我跟组员（其实是舍友），用三天时间搞出来一个AR篮球，不过这个项目还是比较有趣的。</p>
 <p>AR篮球，顾名思义，用了苹果的AR技术，项目会调用相机，然后放一个篮筐在镜头内（就是AR了）。然后手指向前滑动，手也跟着摆动作出投篮的动作，可以扔出篮球（原理就是算物理加速度），每个player轮流仍最后比分。</p>
-<div align=center>
-<img src="9.png"/>
+<div align="center">
+<img src="9.png">
 </div>
 
 <p>吐槽的地方就是扔出去的力度和方向非常难以把控，十个能扔进一个不错了= =</p>

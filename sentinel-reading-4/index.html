@@ -231,13 +231,13 @@ FlowRuleChecker：实际限流的"/>
             <!-- Post Main Content -->
             <div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1">
                 <p>前文：</p>
-<p><a href="https://myblackboxrecorder.com/2021/08/24/Sentinel_reading_1/">Sentinel源码阅读（一）</a></p>
-<p><a href="https://myblackboxrecorder.com/2021/09/07/Sentinel_reading_2/">Sentinel源码阅读（二）</a></p>
-<p><a href="https://myblackboxrecorder.com/2021/09/19/sentinel-reading-3/">Sentinel源码阅读（三）</a></p>
+<p><a href="https://myblackboxrecorder.com/Sentinel_reading_1/">Sentinel源码阅读（一）</a></p>
+<p><a href="https://myblackboxrecorder.com/Sentinel_reading_2/">Sentinel源码阅读（二）</a></p>
+<p><a href="https://myblackboxrecorder.com/sentinel-reading-3/">Sentinel源码阅读（三）</a></p>
 <p>本文将是该系列的最后一篇，主要解析限流部分原理</p>
 <p>限流的责任链节点为FlowSlot，代码结构如下：</p>
-<div align=center>
-<img src="structure.png"/>
+<div align="center">
+<img src="structure.png">
 </div>
 
 <p>重要的类有：</p>
@@ -277,9 +277,9 @@ FlowRuleChecker：实际限流的"/>
 </li>
 </ul>
 <p>最后是执行限流规则中配置的限流器的canPass方法，我们接下来重点分析下这个方法。</p>
-<h3 id="限流器"><a href="#限流器" class="headerlink" title="限流器"></a>限流器</h3><p>限流器就是TrafficShapingController，我们直接看它的几种实现类，对应几种流控效果，类图如下：</p>
-<div align=center>
-<img src="TrafficShapingController.png"/>
+<h3><span id="限流器">限流器</span></h3><p>限流器就是TrafficShapingController，我们直接看它的几种实现类，对应几种流控效果，类图如下：</p>
+<div align="center">
+<img src="TrafficShapingController.png">
 </div>
 
 <ul>
@@ -289,18 +289,18 @@ FlowRuleChecker：实际限流的"/>
 <li>WarmUpRateLimiterController：预热+匀速排队</li>
 </ul>
 <p>我们逐个分析</p>
-<h4 id="DefaultController"><a href="#DefaultController" class="headerlink" title="DefaultController"></a>DefaultController</h4><p>DefaultController的算法较为简单，就是当前统计窗口（每秒），判断是否有足够剩余的容量（代码中也用了令牌的概念）计算如果剩余令牌足够就放行，否则，如果设置了允许occupied_pass，会先借用未来的时间窗口，如果都不行则会直接拒绝（快速失败）。借用相关逻辑在StatisticNode，逻辑就是去计算要到下一个空闲bucket所需时间（借用则会占用，下次不能再借），再与超时时间进行比较。</p>
+<h4><span id="defaultcontroller">DefaultController</span></h4><p>DefaultController的算法较为简单，就是当前统计窗口（每秒），判断是否有足够剩余的容量（代码中也用了令牌的概念）计算如果剩余令牌足够就放行，否则，如果设置了允许occupied_pass，会先借用未来的时间窗口，如果都不行则会直接拒绝（快速失败）。借用相关逻辑在StatisticNode，逻辑就是去计算要到下一个空闲bucket所需时间（借用则会占用，下次不能再借），再与超时时间进行比较。</p>
 <figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">boolean</span> <span class="title">canPass</span><span class="params">(Node node, <span class="keyword">int</span> acquireCount, <span class="keyword">boolean</span> prioritized)</span> </span>&#123;</span><br><span class="line">    <span class="comment">// 计算已使用的令牌，如果是qps则计算passQps，否则计算线程数</span></span><br><span class="line">    <span class="keyword">int</span> curCount = avgUsedTokens(node);</span><br><span class="line">    <span class="comment">// 如果当前请求加入会超出令牌上限</span></span><br><span class="line">    <span class="keyword">if</span> (curCount + acquireCount &gt; count) &#123;</span><br><span class="line">        <span class="comment">// 如果当前为高优先级业务，且指标为QPS</span></span><br><span class="line">        <span class="keyword">if</span> (prioritized &amp;&amp; grade == RuleConstant.FLOW_GRADE_QPS) &#123;</span><br><span class="line">            <span class="keyword">long</span> currentTime;</span><br><span class="line">            <span class="keyword">long</span> waitInMs;</span><br><span class="line">            currentTime = TimeUtil.currentTimeMillis();</span><br><span class="line">            <span class="comment">// 尝试借用未来时间窗口，获取一个等待时间</span></span><br><span class="line">            waitInMs = node.tryOccupyNext(currentTime, acquireCount, count);</span><br><span class="line">            <span class="keyword">if</span> (waitInMs &lt; OccupyTimeoutProperty.getOccupyTimeout()) &#123;</span><br><span class="line">                node.addWaitingRequest(currentTime + waitInMs, acquireCount);</span><br><span class="line">                node.addOccupiedPass(acquireCount);</span><br><span class="line">                <span class="comment">// sleep至未来时间窗口</span></span><br><span class="line">                sleep(waitInMs);</span><br><span class="line"></span><br><span class="line">                <span class="comment">// PriorityWaitException indicates that the request will pass after waiting for &#123;@link @waitInMs&#125;.</span></span><br><span class="line">                <span class="keyword">throw</span> <span class="keyword">new</span> PriorityWaitException(waitInMs);</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">return</span> <span class="keyword">false</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> <span class="keyword">true</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<h4 id="WarmUpController"><a href="#WarmUpController" class="headerlink" title="WarmUpController"></a>WarmUpController</h4><p>当服务未达到一个稳定状态时，一般即仍在初始化时（如建立数据库连接，java static变量懒加载），服务的承载能力可能会远低于稳定状态，即使相对少的请求，仍会拖垮服务，所以我们需要预热（WarmUp），让处理请求的数量缓缓增多。</p>
+<h4><span id="warmupcontroller">WarmUpController</span></h4><p>当服务未达到一个稳定状态时，一般即仍在初始化时（如建立数据库连接，java static变量懒加载），服务的承载能力可能会远低于稳定状态，即使相对少的请求，仍会拖垮服务，所以我们需要预热（WarmUp），让处理请求的数量缓缓增多。</p>
 <p>WarmUpController用了令牌桶算法（或者说思想）。</p>
-<div align=center>
-<img src="token1.png"/>
+<div align="center">
+<img src="token1.png">
 </div>
 
 <p>令牌以一个恒定的速率添加到桶中，当有新的数据包进来时，需要检查桶是否包含足够的令牌。如果不符合，则会按照各种策略进行处理（WarmUpController使用了预热的策略）。</p>
 <p>官网上的图，允许通过的qps随时间的变化：</p>
-<div align=center>
-<img src="slope.png"/>
+<div align="center">
+<img src="slope.png">
 </div>
 
 <p><strong>一开始，系统流量很少，突然流量开始飙增，飙增到一个冷启动阈值时，触发预热，流量缓缓增加，直到达到限流阈值。</strong></p>
@@ -403,9 +403,9 @@ interval = stableInterval + slope * (restTokens - warningTokens)</script><p>换�
 <script type="math/tex; mode=display">
 1/warningQps = 1 / count + slope * aboveTokens</script><script type="math/tex; mode=display">
 warningQps = 1 / (slope * aboveTokens + 1 / count)</script><p>与代码中一致。接下去的代码就好理解了，判断是否超过warningQps，是则限流，否则不限，放进来作为预热，缓慢增加qps。至此，WarmingUpController部分看完了。</p>
-<h4 id="RateLimiterController"><a href="#RateLimiterController" class="headerlink" title="RateLimiterController"></a>RateLimiterController</h4><p>RateLimiterController的限流策略是匀速排队，有了上面GuavaRateLimiter的基础，我们很容易理解，其作用就是通过让线程sleep来调整请求的间隔，达到匀速排队的效果。这种方式主要用于处理间隔性突发的流量，例如消息队列。想象一下这样的场景，在某一秒有大量的请求到来，而接下来的几秒则处于空闲状态，我们希望系统能够在接下来的空闲期间逐渐处理这些请求，而不是在第一秒直接拒绝多余的请求。</p>
-<div align=center>
-<img src="1.png"/>
+<h4><span id="ratelimitercontroller">RateLimiterController</span></h4><p>RateLimiterController的限流策略是匀速排队，有了上面GuavaRateLimiter的基础，我们很容易理解，其作用就是通过让线程sleep来调整请求的间隔，达到匀速排队的效果。这种方式主要用于处理间隔性突发的流量，例如消息队列。想象一下这样的场景，在某一秒有大量的请求到来，而接下来的几秒则处于空闲状态，我们希望系统能够在接下来的空闲期间逐渐处理这些请求，而不是在第一秒直接拒绝多余的请求。</p>
+<div align="center">
+<img src="1.png">
 </div>
 
 <p>看代码</p>
@@ -418,14 +418,14 @@ warningQps = 1 / (slope * aboveTokens + 1 / count)</script><p>与代码中一致
 <p>canPass方法：</p>
 <figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">boolean</span> <span class="title">canPass</span><span class="params">(Node node, <span class="keyword">int</span> acquireCount, <span class="keyword">boolean</span> prioritized)</span> </span>&#123;</span><br><span class="line">    <span class="comment">// Pass when acquire count is less or equal than 0.</span></span><br><span class="line">    <span class="keyword">if</span> (acquireCount &lt;= <span class="number">0</span>) &#123;</span><br><span class="line">        <span class="keyword">return</span> <span class="keyword">true</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="comment">// Reject when count is less or equal than 0.</span></span><br><span class="line">    <span class="comment">// Otherwise,the costTime will be max of long and waitTime will overflow in some cases.</span></span><br><span class="line">    <span class="keyword">if</span> (count &lt;= <span class="number">0</span>) &#123;</span><br><span class="line">        <span class="keyword">return</span> <span class="keyword">false</span>;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">long</span> currentTime = TimeUtil.currentTimeMillis();</span><br><span class="line">    <span class="comment">// Calculate the interval between every two requests.</span></span><br><span class="line">    <span class="keyword">long</span> costTime = Math.round(<span class="number">1.0</span> * (acquireCount) / count * <span class="number">1000</span>);</span><br><span class="line"></span><br><span class="line">    <span class="comment">// Expected pass time of this request.</span></span><br><span class="line">    <span class="keyword">long</span> expectedTime = costTime + latestPassedTime.get();</span><br><span class="line"></span><br><span class="line">    <span class="keyword">if</span> (expectedTime &lt;= currentTime) &#123;</span><br><span class="line">        <span class="comment">// Contention may exist here, but it&#x27;s okay.</span></span><br><span class="line">        latestPassedTime.set(currentTime);</span><br><span class="line">        <span class="keyword">return</span> <span class="keyword">true</span>;</span><br><span class="line">    &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">        <span class="comment">// Calculate the time to wait.</span></span><br><span class="line">        <span class="keyword">long</span> waitTime = costTime + latestPassedTime.get() - TimeUtil.currentTimeMillis();</span><br><span class="line">        <span class="keyword">if</span> (waitTime &gt; maxQueueingTimeMs) &#123;</span><br><span class="line">            <span class="keyword">return</span> <span class="keyword">false</span>;</span><br><span class="line">        &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">            <span class="keyword">long</span> oldTime = latestPassedTime.addAndGet(costTime);</span><br><span class="line">            <span class="keyword">try</span> &#123;</span><br><span class="line">                waitTime = oldTime - TimeUtil.currentTimeMillis();</span><br><span class="line">                <span class="keyword">if</span> (waitTime &gt; maxQueueingTimeMs) &#123;</span><br><span class="line">                    latestPassedTime.addAndGet(-costTime);</span><br><span class="line">                    <span class="keyword">return</span> <span class="keyword">false</span>;</span><br><span class="line">                &#125;</span><br><span class="line">                <span class="comment">// in race condition waitTime may &lt;= 0</span></span><br><span class="line">                <span class="keyword">if</span> (waitTime &gt; <span class="number">0</span>) &#123;</span><br><span class="line">                    Thread.sleep(waitTime);</span><br><span class="line">                &#125;</span><br><span class="line">                <span class="keyword">return</span> <span class="keyword">true</span>;</span><br><span class="line">            &#125; <span class="keyword">catch</span> (InterruptedException e) &#123;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> <span class="keyword">false</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 <p>使用了漏桶算法，偷网上的图：</p>
-<div align=center>
-<img src="2.png"/>
+<div align="center">
+<img src="2.png">
 </div>
 
 <p>核心是可以看作一个带有常量服务时间的队列，有请求就一直放入桶中直到溢出丢弃，流出的速度也被捅所控制（一般是固定值）。在Sentinel中，这个队列长度就是maxQueueingTimeMs，限定流出的速度是1 / count秒，这样就做到了匀速排队。</p>
 <p>理解了漏桶算法再看代码就比较简单，先通过算等待时间判断能不能放入队列中了，如果能放入则sleep直至匀速要求的时间间隔再放行，否则拒绝。这里有个不好理解的地方是waitTime为什么要一模一样的算两次，考虑是在高并发下保险一点？如果你有答案可以在评论区留言。</p>
 <p>值得一提的是令牌桶算法与漏桶算法的适合业务场景。两者都可以做到流量控制，漏桶较为简单，直接控制请求的速度，且阈值一直是恒定的，多余的请求会首先尝试排队再去拒绝。令牌桶因为桶中会有过往的令牌，它能允许短时间内通过比阈值更大的流量，因此我认为应对抖动的突发流量令牌桶会更合适（当然，你还需要关注下游是否能承载这样的突发流量）。而如果业务场景更关注请求可用，因为漏桶会先去尝试排队，请求可能只是慢一点而不是直接拒绝，对用户体验来说好一些。例如长时间的高并发场景（秒杀、抢购、0点签到），这些场景已经不能归于“抖动”的范畴，且业务上肯定更希望尽量多的的请求成功，即使慢一些，这时候漏桶会合适一些。</p>
-<h4 id="WarmUpRateLimiterController"><a href="#WarmUpRateLimiterController" class="headerlink" title="WarmUpRateLimiterController"></a>WarmUpRateLimiterController</h4><p>WarmUpRateLimiterController是WarmUpController子类，它其实就是将上述两个限流器结合起来，博采众长。</p>
+<h4><span id="warmupratelimitercontroller">WarmUpRateLimiterController</span></h4><p>WarmUpRateLimiterController是WarmUpController子类，它其实就是将上述两个限流器结合起来，博采众长。</p>
 <p>它的canPass方法结合了两者，流程是：</p>
 <ul>
 <li>预热的步骤，同步令牌桶，计算预热的warningQps</li>
@@ -436,7 +436,7 @@ warningQps = 1 / (slope * aboveTokens + 1 / count)</script><p>与代码中一致
 <p><strong>WarmUpRateLimiterController相对WarmUpController的变化是改变了达到警戒线后的策略，不是直接拒绝而是排队。相对RateLimiterController的变化则是让排队不再是匀速的，在cold阶段，速度较慢，stable阶段，速度较快，有预热的效果。</strong></p>
 <p>至此，限流部分结束。另外第一篇里讲到了隔离，其实隔离就是限流的一种，只是限的不是qps，而是线程数，我们可以看到代码中取令牌可以有算qps和算线程数两种方式，如果是线程数，其实用处就是隔离了。</p>
 <p>另外剩余的如黑白名单控制，系统规则其实都较为简单。黑白名单控制在<code>AuthoritySlot</code>，逻辑是根据Context中的origin与规则中的配置做比较配对，再做控制。系统规则在<code>SystemSlot</code>，有一个全局的类存储配置，并且其qps等指标不会从当前Node拿，而是会从一个全局的ClusterNode拿，这个node会聚合所有下面Node的指标，系统规则就根据全局的指标执行全局的系统规则。</p>
-<h3 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h3><p>至此，Sentinel的源码阅读告一段落了（长舒一口气），前前后后快两个月时间。从一开始看通主要流程后觉得还比较简单，到死磕Context、Statistics、Degrade、FlowControl等难度较大的模块，收获良多，也切实反馈到了实际工作中。一些诸如锁、上下文模块、责任链模式等从代码中学到的内容，在做一些业务基础设施时，怎么设计怎么写，对我有很大的参考价值。而且读源码与读其他归纳的博客是不一样的，且不说那些博客有大量雷同，含金量未知，这个思考的过程以及细节的推敲是只有源码阅读才能带给你的。最后，如果你看到了这里，感谢你的阅读，希望对你理解Sentinel以及其中的原理算法有帮助。</p>
+<h3><span id="总结">总结</span></h3><p>至此，Sentinel的源码阅读告一段落了（长舒一口气），前前后后快两个月时间。从一开始看通主要流程后觉得还比较简单，到死磕Context、Statistics、Degrade、FlowControl等难度较大的模块，收获良多，也切实反馈到了实际工作中。一些诸如锁、上下文模块、责任链模式等从代码中学到的内容，在做一些业务基础设施时，怎么设计怎么写，对我有很大的参考价值。而且读源码与读其他归纳的博客是不一样的，且不说那些博客有大量雷同，含金量未知，这个思考的过程以及细节的推敲是只有源码阅读才能带给你的。最后，如果你看到了这里，感谢你的阅读，希望对你理解Sentinel以及其中的原理算法有帮助。</p>
 
 
                 
