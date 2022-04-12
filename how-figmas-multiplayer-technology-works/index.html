@@ -1,0 +1,358 @@
+<!DOCTYPE html>
+<html lang="zn-CN">
+
+<!-- Head tag -->
+<head>
+
+    <meta charset="utf-8"/>
+    <meta http-equiv="X-UA-Compatible" content="IE=edge"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1"/>
+
+    <!--Description-->
+
+    
+
+    
+        <meta name="description" content="Figma是一款在线的UI设计软件，相比较传统的如sketch、axure等设计软件，它的优势是在云端，支持协同编辑，能完成设计的全流程，这让它实现了弯道超车。对于任何一家做SaaS软件的公司，Figma都有很好的借鉴意义。今天主要讨论的是其协同功能。为什么讨论这个？自然是因为内部调研，因为我们也有"/>
+    
+
+    <!--Author-->
+    
+        <meta name="author" content="Gary Yuan"/>
+    
+
+    <!--Open Graph Title-->
+    
+        <meta property="og:title" content="【翻译】Figma是如何实现多人协作的"/>
+    
+
+    <!--Open Graph Description-->
+    
+        <meta property="og:description" content="Figma是一款在线的UI设计软件，相比较传统的如sketch、axure等设计软件，它的优势是在云端，支持协同编辑，能完成设计的全流程，这让它实现了弯道超车。对于任何一家做SaaS软件的公司，Figma都有很好的借鉴意义。今天主要讨论的是其协同功能。为什么讨论这个？自然是因为内部调研，因为我们也有"/>
+    
+
+    <!--Open Graph Site Name-->
+        <meta property="og:site_name" content="Gary&#39;s Blog"/>
+
+    <!--Type page-->
+    
+        <meta property="og:type" content="article"/>
+    
+
+    <!--Page Cover-->
+    
+    
+        <meta property="og:image" content="http://myblackboxrecorder.comimg/bg.jpg"/>
+    
+
+        <meta name="twitter:card" content="summary_large_image"/>
+
+    
+
+    
+        <meta name="twitter:image" content="http://myblackboxrecorder.comimg/bg.jpg"/>
+    
+
+    <!-- Title -->
+    
+    <title>【翻译】Figma是如何实现多人协作的 - Gary&#39;s Blog</title>
+
+    <!-- Bootstrap Core CSS -->
+    <link href="//maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css" rel="stylesheet"/>
+
+    <!-- Custom CSS -->
+    
+<link rel="stylesheet" href="/css/style.css">
+
+
+    <!-- Custom Fonts -->
+    <link href="//maxcdn.bootstrapcdn.com/font-awesome/4.6.3/css/font-awesome.min.css" rel="stylesheet" type="text/css"/>
+    <link href="//fonts.googleapis.com/css?family=Lora:400,700,400italic,700italic" rel="stylesheet" type="text/css"/>
+    <link href="//fonts.googleapis.com/css?family=Open+Sans:300italic,400italic,600italic,700italic,800italic,400,300,600,700,800" rel="stylesheet" type="text/css"/>
+
+    <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
+    <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+    <!--[if lt IE 9]>
+    <script src="//oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+    <script src="//oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
+    <![endif]-->
+    
+
+    <!-- Gallery -->
+    <link href="/css/featherlight.min.css" type="text/css" rel="stylesheet"/>
+
+    <!-- Google Analytics -->
+    
+
+
+    <!-- favicon -->
+    
+    <link rel="icon" href="https://myblackboxrecorder.oss-cn-hangzhou.aliyuncs.com/a049a-jooxb-001.ico"/>
+    
+
+<meta name="generator" content="Hexo 5.4.0"></head>
+
+
+<body>
+
+    <!-- Menu -->
+    <!-- Navigation -->
+<nav class="navbar navbar-default navbar-custom navbar-fixed-top">
+    <div class="container-fluid">
+        <!-- Brand and toggle get grouped for better mobile display -->
+        <div class="navbar-header page-scroll">
+            <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+            <a class="navbar-brand" href="/">Gary's Blog</a>
+        </div>
+
+        <!-- Collect the nav links, forms, and other content for toggling -->
+        <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+            <ul class="nav navbar-nav navbar-right">
+                
+                    <li>
+                        <a href="/">
+                            
+                                Home
+                            
+                        </a>
+                    </li>
+                
+                    <li>
+                        <a href="/archives">
+                            
+                                Archives
+                            
+                        </a>
+                    </li>
+                
+                    <li>
+                        <a href="/tags">
+                            
+                                Tags
+                            
+                        </a>
+                    </li>
+                
+                    <li>
+                        <a href="/about">
+                            
+                                about
+                            
+                        </a>
+                    </li>
+                
+            </ul>
+        </div>
+        <!-- /.navbar-collapse -->
+    </div>
+    <!-- /.container -->
+</nav>
+
+    <!-- Main Content -->
+    <!-- Page Header -->
+<!-- Set your background image for this header in your post front-matter: cover -->
+
+<header class="intro-header" style="background-image: url('/img/bg.jpg')">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1">
+                <div class="post-heading">
+                    <h1>【翻译】Figma是如何实现多人协作的</h1>
+                    
+                    <span class="meta">
+                        <!-- Date and Author -->
+                        
+                        
+                            2021-09-07
+                        
+                    </span>
+                </div>
+            </div>
+        </div>
+    </div>
+</header>
+
+<!-- Post Content -->
+<article>
+    <div class="container">
+        <div class="row">
+
+            <!-- Tags and categories -->
+           
+                <div class="col-lg-4 col-lg-offset-2 col-md-5 col-md-offset-1 post-tags">
+                    
+                        
+
+
+<a href="/tags/技术/">#技术</a> <a href="/tags/翻译/">#翻译</a>
+
+
+                    
+                </div>
+                <div class="col-lg-4 col-md-5 post-categories">
+                    
+                </div>
+            
+
+            <!-- Gallery -->
+            
+
+            <!-- Post Main Content -->
+            <div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1">
+                <blockquote>
+<p>Figma是一款在线的UI设计软件，相比较传统的如sketch、axure等设计软件，它的优势是在云端，支持协同编辑，能完成设计的全流程，这让它实现了弯道超车。对于任何一家做SaaS软件的公司，Figma都有很好的借鉴意义。今天主要讨论的是其协同功能。为什么讨论这个？自然是因为内部调研，因为我们也有类似的场景，虽然不是同一行业，但都有协同编辑或展示的需求。这是一个无人探索的深水区，本文拟翻译一篇Figma技术博客中关于协同的关键文章，管中窥豹一番。</p>
+</blockquote>
+<p>原文：<a target="_blank" rel="noopener" href="https://www.figma.com/blog/how-figmas-multiplayer-technology-works/">https://www.figma.com/blog/how-figmas-multiplayer-technology-works/</a></p>
+<hr>
+<h1><span id="figma多人协作技术原理">Figma多人协作技术原理</span></h1><p>作者：<a target="_blank" rel="noopener" href="https://twitter.com/evanwallace">Evan Wallace</a>，Figma CTO</p>
+<p>发表时间：2019年10月16日</p>
+<blockquote>
+<p>如果你想进一步了解我们接下来的产品方向，请查看 <a target="_blank" rel="noopener" href="https://www.figma.com/blog/introducing-figma-community/">不仅是多人协作：在Figma中共同构建社区</a>，在那里我们分享了一些令人激动的产品计划。以下是正文。</p>
+</blockquote>
+<p>当我们在四年前第一次启动<a target="_blank" rel="noopener" href="https://www.figma.com/blog/multiplayer-editing-in-figma/">多人协作功能</a>，我们就决定开发自己的解决方案。在此之前，没有别的设计软件提供这样的特性。并且，我们不想使用<a target="_blank" rel="noopener" href="https://en.wikipedia.org/wiki/Operational_transformation">operational transforms算法</a>（也叫OTs算法），尽管这是一种标准的多人协作算法，在诸如谷歌文档等app上得到流行。作为一家创业公司，我们重视快速实装功能的能力，对我们的场景来说，OTs算法显得太复杂了，是不必要的。因此我们构建了一个定制化的多人协作系统，它更简洁，并更易实现。</p>
+<p>当时，我们不确定开发这个功能是不是一个正确的产品决策。没有人要求一个多人协同设计工具——甚至正相反，一些人讨厌这个主意。设计师们担心实时的协作编辑会导致“艺术总监悬停“（被监控）以及“委员会式设计”（创意被压缩）的灾难。</p>
+<p>但最终，我们不得不这样做。因为作为一款云端设计软件，不提供协作能力是不对的。它能去除导出、同步或通过email发送文件副本的繁琐步骤，并允许更多人参与设计工作（比如文案和开发）。只需一个项目链接，任何人都可以查看项目当前的状态，而不会中断工作人员。</p>
+<p>我们赌对了，现如今，多人协作已然成为了所有云端生产力工具的标配，而不仅仅是设计。不过尽管我们每天都在用这些具有协同编辑能力的工具，关于它们且公开的案例研究却并不多。</p>
+<p>我们觉得是时候分享一下Figma是如何做到的，以期望帮到其他人。对于那些喜欢了解计算机理论如何在实践中应用的人来说，这应该会是一篇有趣的文章。本文将涵盖很多内容，不过每个部分都是建立在前一部分的基础上的。到最后，你应该会对整个系统有所了解。</p>
+<h2><span id="背景figma的基础架构-ots算法等">背景：Figma的基础架构、OTs算法等</span></h2><p>在讨论Figma多人协作的协议前，有必要了解一些关于协同系统是如何建立的背景。Figma使用C/S架构，客户端就是网页，通过WebSocket与一个服务器集群通信；服务端目前会为每个协同编辑的文档启动一个进程，协同编辑中的每个用户都会关联到这个文档。如果你感兴趣，<a target="_blank" rel="noopener" href="https://www.figma.com/blog/rust-in-production-at-figma/">这篇文章</a>讲述了我们如何扩展协同服务器。</p>
+<p>当一个文档被打开，客户端启动并下载文件的副本。从这个时间点起，任何双向的文档修改会通过WebSocket连接同步。Figma允许你在任何时间下线（退出协同状态）并能继续编辑。当你重新上线，客户端会下载一份文件最新的副本，你所有下线时进行的改动都会作用于这个最新的副本之上，然后建立WebSocket连接并同步更新。这意味着连接和重连的过程都很简单，所有协同编辑的复杂性都落在了如何处理已连接文档的同步更新上。</p>
+<p>值得一提的是，协同编辑系统只用来同步对Figma文档的更新。我们虽然也同步一些其他数据（如评论、用户、团队、项目等），但那是存在Postgres中并用其他独立的系统同步的，而不是在我们的协同编辑系统中的。尽管两者很相似，权衡各种因素（性能、可用性、安全性），它们有着不同的实现。</p>
+<p>不过在一开始我们不是基于这样的实现。在做出这样根本性的改变之前，重要的是能有一种快速迭代与实验的方法。这就是为什么我们首先建立了一个原型环境来测试我们的想法，而不是直接上线。这个原型是一个网页，它模拟了三个客户端连接服务器，并可视化了系统的整个状态。从而让我们可以围绕离线的客户端与带宽受限的连接设置不同的场景。</p>
+<p>一旦我们弄清楚如何去构建协同系统，就可以直接将原型中的想法移植到正式的代码库中。我们就使用这个原型来快速地研究并评估各种协同算法与数据结构。</p>
+<div align="center">
+<img src="1.jpg">
+</div>
+
+<h3><span id="ots与crdts算法如何影响我们对协同的实现">OTs与CRDTs算法如何影响我们对协同的实现</span></h3><p>协同编辑技术有一个长远的历史，自<a target="_blank" rel="noopener" href="https://en.wikipedia.org/wiki/The_Mother_of_All_Demos">Douglas Engelbart在1968年的demo</a>开始就一直被讨论。在我们深入了解Figma协同系统如何实现之前，有必要快速地概览一番这些影响我们的传统方法，即OTs与CRDTs。</p>
+<p>之前提到，OTs为大多数基于文本的多人协作应用提供支持，例如谷歌文档。它是最知名的技术，不过在研究它的过程中，我们很快意识到对我们想要达到的效果来说，有些矫枉过正了。对长文本文档编辑来说，这是一个很棒的方法，有着较低的内存消耗与较高的性能。但是它太复杂且难以正确实现，其可能导致状态的组合爆炸，<a target="_blank" rel="noopener" href="https://en.wikipedia.org/wiki/Operational_transformation#Critique_of_OT">这很难预测</a>。</p>
+<p>在设计协同系统时，我们的主要目标是让完成这个系统不要过于复杂。简单的系统更容易推理，从而更容易实现、调试、测试及维护。由于Figma不是文本编辑器，因此我们不需要OTs的强大功能，可以摆脱一些复杂的事情。</p>
+<p>Figma的实现灵感来源于CRDTs，全称为<a target="_blank" rel="noopener" href="https://en.wikipedia.org/wiki/Conflict-free_replicated_data_type">Conflict-free Replicated Data Types（无冲突复制的数据类型）</a>。CRDTs是一组可以在分布式系统中不冲突使用的数据结构。所有CRDTs满足特定的数学属性，保证最终一致性。如果不再有其他更新，最终所有访问者都会看到相同一致的内容。这一约束是正确性所必需的；我们不能让编辑同一个Figma文档的两个客户端产生分歧并无法汇合。</p>
+<p>有许多种CRDTs的类型，见<a target="_blank" rel="noopener" href="https://github.com/pfrazee/crdt_notes/tree/68c5fe81ade109446a9f4c24e03290ec5493031f#portfolio-of-basic-crdts">这个列表</a>。一些例子如下：</p>
+<ul>
+<li><strong>Grow-only set</strong>：这是一个元素的集合。其update操作只有一种类型即新增某物到集合。增加同一物第两次会视为无效，因此你可以保证最终的内容一致，只需要应用所有更新，且不需要考虑顺序。</li>
+<li><strong>Last-writer-wins register</strong>：这个一个单个元素的容器。更新操作被实现为一个新的值、时间戳与节点标识符的组合。你可以保证元素的值通过取最新一次更新的值（如果时间相同，使用标识符来判断）。</li>
+</ul>
+<p>Figma没有使用严格意义上的CRDTs。CRDTs被设计用于分布式且去中心化的系统，因此没有一个唯一的中心节点来决定最终状态。这样做会产生一些不可避免的性能和内存开销。但Figma实际上是有中心的（服务器就是中心节点），因此我们可以通过去除额外的开销来简化我们的系统，从而受益于更快更精简的实现。</p>
+<p>此外，Figma的数据结构也不仅仅是单独某种的CRDTs，而是从多种CRDTs中获取灵感并组合使用，创建出表达Figma文档的最终数据结构（下文会描述）。</p>
+<p>即使你已经有一个客户端-服务端的体系，CRDTs也值得去研究，因此它有经过充分研究的坚实基础。理解CRDTs有助于建立关于如何正确构建系统的sense。之后，就可以像我们一样根据应用的需要放宽对CRDTs的要求。</p>
+<h3><span id="figma文档的结构">Figma文档的结构</span></h3>
+
+                
+            </div>
+
+            <!-- Comments -->
+            
+                <div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1">
+                    <div id="gitalk-container"></div>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.css">
+<script src="https://cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.min.js"></script>
+<script>
+var gitalk = new Gitalk({
+  clientID: 'bfdcccffd65a099e0dd6',
+  clientSecret: '0e63b1d8f5fa09b4cf84c05ba3a03c993f9b0a5f',
+  repo: 'elliotloststh.github.io',
+  owner: 'elliotloststh',
+  admin: ['elliotloststh'],
+  id: location.pathname,      // Ensure uniqueness and length less than 50
+  distractionFreeMode: false  // Facebook-like distraction free mode
+})
+
+gitalk.render('gitalk-container')
+</script>
+
+
+
+
+
+
+
+
+
+                </div>
+            
+        </div>
+    </div>
+</article>
+
+    <!-- Footer -->
+    <hr />
+
+<!-- Footer -->
+<footer>
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1">
+                <ul class="list-inline text-center">
+                    
+
+                    
+
+                    
+                        <li>
+                            <a href="https://github.com/Elliotloststh" target="_blank">
+                                <span class="fa-stack fa-lg">
+                                    <i class="fa fa-circle fa-stack-2x"></i>
+                                    <i class="fa fa-github fa-stack-1x fa-inverse"></i>
+                                </span>
+                            </a>
+                        </li>
+                    
+
+                    
+
+                    
+                        <li>
+                            <a href="mailto:gary.yuan.jh@gmail.com" target="_blank">
+                                <span class="fa-stack fa-lg">
+                                    <i class="fa fa-circle fa-stack-2x"></i>
+                                    <i class="fa fa-envelope-o fa-stack-1x fa-inverse"></i>
+                                </span>
+                            </a>
+                        </li>
+                    
+                </ul>
+                <p class="copyright text-muted">&copy; 2022 Gary Yuan<br></p>
+            </div>
+        </div>
+    </div>
+</footer>
+
+
+    <!-- After footer scripts -->
+    
+<!-- jQuery -->
+<script src="//code.jquery.com/jquery-2.1.4.min.js"></script>
+
+<!-- Bootstrap -->
+<script src="//maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js"></script>
+
+<!-- Gallery -->
+<script src="/js/featherlight.min.js" type="text/javascript" charset="utf-8"></script>
+
+<!-- Disqus Comments -->
+
+
+
+<script type="text/x-mathjax-config">
+    MathJax.Hub.Config({
+        tex2jax: {
+            inlineMath: [ ["$","$"], ["\\(","\\)"] ],
+            skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code'],
+            processEscapes: true
+        }
+    });
+    MathJax.Hub.Queue(function() {
+        var all = MathJax.Hub.getAllJax();
+        for (var i = 0; i < all.length; ++i)
+            all[i].SourceElement().parentNode.className += ' has-jax';
+    });
+</script>
+<script src="//cdn.bootcss.com/mathjax/2.7.3/MathJax.js?config=TeX-MML-AM_CHTML"></script>
+</body>
+
+</html>
