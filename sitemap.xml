@@ -4,7 +4,7 @@
   <url>
     <loc>http://myblackboxrecorder.com/how-figmas-multiplayer-technology-works/</loc>
     
-    <lastmod>2022-04-12</lastmod>
+    <lastmod>2022-04-13</lastmod>
     
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
@@ -121,7 +121,7 @@
 
   <url>
     <loc>http://myblackboxrecorder.com/</loc>
-    <lastmod>2022-04-12</lastmod>
+    <lastmod>2022-04-13</lastmod>
     <changefreq>daily</changefreq>
     <priority>1.0</priority>
   </url>
@@ -129,49 +129,49 @@
   
   <url>
     <loc>http://myblackboxrecorder.com/tags/%E6%8A%80%E6%9C%AF/</loc>
-    <lastmod>2022-04-12</lastmod>
+    <lastmod>2022-04-13</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.2</priority>
   </url>
   
   <url>
     <loc>http://myblackboxrecorder.com/tags/Java/</loc>
-    <lastmod>2022-04-12</lastmod>
+    <lastmod>2022-04-13</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.2</priority>
   </url>
   
   <url>
     <loc>http://myblackboxrecorder.com/tags/Sentinel/</loc>
-    <lastmod>2022-04-12</lastmod>
+    <lastmod>2022-04-13</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.2</priority>
   </url>
   
   <url>
     <loc>http://myblackboxrecorder.com/tags/%E6%9D%82%E8%B0%88/</loc>
-    <lastmod>2022-04-12</lastmod>
+    <lastmod>2022-04-13</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.2</priority>
   </url>
   
   <url>
     <loc>http://myblackboxrecorder.com/tags/%E7%BF%BB%E8%AF%91/</loc>
-    <lastmod>2022-04-12</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.2</priority>
-  </url>
-  
-  <url>
-    <loc>http://myblackboxrecorder.com/tags/%E7%9F%A5%E8%A1%8C/</loc>
-    <lastmod>2022-04-12</lastmod>
+    <lastmod>2022-04-13</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.2</priority>
   </url>
   
   <url>
     <loc>http://myblackboxrecorder.com/tags/hexo/</loc>
-    <lastmod>2022-04-12</lastmod>
+    <lastmod>2022-04-13</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.2</priority>
+  </url>
+  
+  <url>
+    <loc>http://myblackboxrecorder.com/tags/%E7%9F%A5%E8%A1%8C/</loc>
+    <lastmod>2022-04-13</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.2</priority>
   </url>
