@@ -1,0 +1,342 @@
+<!DOCTYPE html>
+<html lang="zn-CN">
+
+<!-- Head tag -->
+<head>
+
+    <meta charset="utf-8"/>
+    <meta http-equiv="X-UA-Compatible" content="IE=edge"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1"/>
+
+    <!--Description-->
+
+    
+
+    
+        <meta name="description" content="又是一个值班的晚上，一个人窝在椅子上摸鱼。
+OK，到点发布了，我熟练地操作着发布系统，随着发布按钮的按下，服务pod开始滚动重启。观察业务，没有错误。看了眼服务的监控状态，除了发布一开始有些曲线的波动，后续趋于平稳。看来又是稳如老狗的一次发布呢。
+继续下一个服务，发布开始的几分钟曲线不太正常，一些p"/>
+    
+
+    <!--Author-->
+    
+        <meta name="author" content="Gary Yuan"/>
+    
+
+    <!--Open Graph Title-->
+    
+        <meta property="og:title" content="负载均衡爬坑记"/>
+    
+
+    <!--Open Graph Description-->
+    
+        <meta property="og:description" content="又是一个值班的晚上，一个人窝在椅子上摸鱼。
+OK，到点发布了，我熟练地操作着发布系统，随着发布按钮的按下，服务pod开始滚动重启。观察业务，没有错误。看了眼服务的监控状态，除了发布一开始有些曲线的波动，后续趋于平稳。看来又是稳如老狗的一次发布呢。
+继续下一个服务，发布开始的几分钟曲线不太正常，一些p"/>
+    
+
+    <!--Open Graph Site Name-->
+        <meta property="og:site_name" content="Gary&#39;s Blog"/>
+
+    <!--Type page-->
+    
+        <meta property="og:type" content="article"/>
+    
+
+    <!--Page Cover-->
+    
+    
+        <meta property="og:image" content="http://myblackboxrecorder.comimg/bg.jpg"/>
+    
+
+        <meta name="twitter:card" content="summary_large_image"/>
+
+    
+
+    
+        <meta name="twitter:image" content="http://myblackboxrecorder.comimg/bg.jpg"/>
+    
+
+    <!-- Title -->
+    
+    <title>负载均衡爬坑记 - Gary&#39;s Blog</title>
+
+    <!-- Bootstrap Core CSS -->
+    <link href="//maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css" rel="stylesheet"/>
+
+    <!-- Custom CSS -->
+    
+<link rel="stylesheet" href="/css/style.css">
+
+
+    <!-- Custom Fonts -->
+    <link href="//maxcdn.bootstrapcdn.com/font-awesome/4.6.3/css/font-awesome.min.css" rel="stylesheet" type="text/css"/>
+    <link href="//fonts.googleapis.com/css?family=Lora:400,700,400italic,700italic" rel="stylesheet" type="text/css"/>
+    <link href="//fonts.googleapis.com/css?family=Open+Sans:300italic,400italic,600italic,700italic,800italic,400,300,600,700,800" rel="stylesheet" type="text/css"/>
+
+    <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
+    <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+    <!--[if lt IE 9]>
+    <script src="//oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+    <script src="//oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
+    <![endif]-->
+    
+
+    <!-- Gallery -->
+    <link href="/css/featherlight.min.css" type="text/css" rel="stylesheet"/>
+
+    <!-- Google Analytics -->
+    
+
+
+    <!-- favicon -->
+    
+    <link rel="icon" href="https://myblackboxrecorder.oss-cn-hangzhou.aliyuncs.com/a049a-jooxb-001.ico"/>
+    
+
+<meta name="generator" content="Hexo 5.4.0"></head>
+
+
+<body>
+
+    <!-- Menu -->
+    <!-- Navigation -->
+<nav class="navbar navbar-default navbar-custom navbar-fixed-top">
+    <div class="container-fluid">
+        <!-- Brand and toggle get grouped for better mobile display -->
+        <div class="navbar-header page-scroll">
+            <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+            <a class="navbar-brand" href="/">Gary's Blog</a>
+        </div>
+
+        <!-- Collect the nav links, forms, and other content for toggling -->
+        <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+            <ul class="nav navbar-nav navbar-right">
+                
+                    <li>
+                        <a href="/">
+                            
+                                Home
+                            
+                        </a>
+                    </li>
+                
+                    <li>
+                        <a href="/archives">
+                            
+                                Archives
+                            
+                        </a>
+                    </li>
+                
+                    <li>
+                        <a href="/tags">
+                            
+                                Tags
+                            
+                        </a>
+                    </li>
+                
+                    <li>
+                        <a href="/about">
+                            
+                                about
+                            
+                        </a>
+                    </li>
+                
+            </ul>
+        </div>
+        <!-- /.navbar-collapse -->
+    </div>
+    <!-- /.container -->
+</nav>
+
+    <!-- Main Content -->
+    <!-- Page Header -->
+<!-- Set your background image for this header in your post front-matter: cover -->
+
+<header class="intro-header" style="background-image: url('/img/bg.jpg')">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1">
+                <div class="post-heading">
+                    <h1>负载均衡爬坑记</h1>
+                    
+                    <span class="meta">
+                        <!-- Date and Author -->
+                        
+                        
+                            2022-03-29
+                        
+                    </span>
+                </div>
+            </div>
+        </div>
+    </div>
+</header>
+
+<!-- Post Content -->
+<article>
+    <div class="container">
+        <div class="row">
+
+            <!-- Tags and categories -->
+           
+                <div class="col-lg-4 col-lg-offset-2 col-md-5 col-md-offset-1 post-tags">
+                    
+                        
+
+
+<a href="/tags/技术/">#技术</a>
+
+
+                    
+                </div>
+                <div class="col-lg-4 col-md-5 post-categories">
+                    
+                </div>
+            
+
+            <!-- Gallery -->
+            
+
+            <!-- Post Main Content -->
+            <div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1">
+                <p>又是一个值班的晚上，一个人窝在椅子上摸鱼。</p>
+<p>OK，到点发布了，我熟练地操作着发布系统，随着发布按钮的按下，服务pod开始滚动重启。观察业务，没有错误。看了眼服务的监控状态，除了发布一开始有些曲线的波动，后续趋于平稳。看来又是稳如老狗的一次发布呢。</p>
+<p>继续下一个服务，发布开始的几分钟曲线不太正常，一些pod流量会飙升一些，一些pod流量一开始过低。继续下一个服务。。。居然都是一样的情况。我意识到可能哪里出了问题，赶紧看下报警与业务，貌似一切正常，至于以前，印象中也有发布开始阶段流量不均匀的情况，当时都粗糙地归类于刚启动不稳定了，现在想想没有道理。</p>
+<p>我们的流量控制是基于微服务框架，由配置路由规则与负载均衡一起决定最终指向哪个服务器。不可能有人会配置线上pod级别的路由规则，那么应该是负载均衡出了问题。基于追根究底的探索精神（闲的没事），看了下中间件负载均衡的算法。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//</span></span><br><span class="line"><span class="comment">// Source code recreated from a .class file by IntelliJ IDEA</span></span><br><span class="line"><span class="comment">// (powered by FernFlower decompiler)</span></span><br><span class="line"><span class="comment">//</span></span><br><span class="line"> </span><br><span class="line"><span class="keyword">package</span> com.qunhe.rpc.loadbalancer.rule;</span><br><span class="line"> </span><br><span class="line"><span class="keyword">import</span> com.qunhe.rpc.client.config.IClientConfig;</span><br><span class="line"><span class="keyword">import</span> com.qunhe.rpc.common.logger.Logger;</span><br><span class="line"><span class="keyword">import</span> com.qunhe.rpc.common.logger.LoggerFactory;</span><br><span class="line"><span class="keyword">import</span> com.qunhe.rpc.loadbalancer.ILoadBalancer;</span><br><span class="line"><span class="keyword">import</span> com.qunhe.rpc.loadbalancer.Server;</span><br><span class="line"><span class="keyword">import</span> java.util.Iterator;</span><br><span class="line"><span class="keyword">import</span> java.util.LinkedHashMap;</span><br><span class="line"><span class="keyword">import</span> java.util.List;</span><br><span class="line"><span class="keyword">import</span> java.util.Map.Entry;</span><br><span class="line"><span class="keyword">import</span> java.util.concurrent.atomic.AtomicInteger;</span><br><span class="line"> </span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">RoundRobinRule</span> <span class="keyword">extends</span> <span class="title">AbstractLoadBalancerRule</span> </span>&#123;</span><br><span class="line">    <span class="keyword">private</span> AtomicInteger nextIndexAI;</span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">final</span> Logger LOG = LoggerFactory.getLogger(RoundRobinRule.class);</span><br><span class="line"> </span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="title">RoundRobinRule</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        <span class="keyword">this</span>.nextIndexAI = <span class="keyword">new</span> AtomicInteger(<span class="number">0</span>);</span><br><span class="line">        <span class="keyword">this</span>.predicate = CompositePredicate.withPredicate(<span class="keyword">new</span> AvailabilityPredicate(<span class="keyword">this</span>, (IClientConfig)<span class="keyword">null</span>)).addFallbackPredicate(AbstractServerPredicate.alwaysTrue()).build();</span><br><span class="line">    &#125;</span><br><span class="line"> </span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="title">RoundRobinRule</span><span class="params">(ILoadBalancer lb)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">this</span>.setLoadBalancer(lb);</span><br><span class="line">    &#125;</span><br><span class="line"> </span><br><span class="line">    <span class="function"><span class="keyword">public</span> Server <span class="title">choose</span><span class="params">(ILoadBalancer lb, Object key)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">if</span> (lb == <span class="keyword">null</span>) &#123;</span><br><span class="line">            LOG.warn(<span class="string">&quot;no load balancer&quot;</span>);</span><br><span class="line">            <span class="keyword">return</span> <span class="keyword">null</span>;</span><br><span class="line">        &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">            <span class="keyword">int</span> maxWeight = <span class="number">0</span>;</span><br><span class="line">            <span class="keyword">int</span> minWeight = <span class="number">2147483647</span>;</span><br><span class="line">            <span class="keyword">int</span> weightSum = <span class="number">0</span>;</span><br><span class="line">            LinkedHashMap&lt;Server, RoundRobinRule.IntegerWrapper&gt; weightMap = <span class="keyword">new</span> LinkedHashMap();</span><br><span class="line">            List&lt;Server&gt; svrs = lb.getServerList(<span class="keyword">true</span>);</span><br><span class="line"> </span><br><span class="line">            <span class="keyword">int</span> curIndex;</span><br><span class="line">            <span class="keyword">int</span> mod;</span><br><span class="line">            <span class="keyword">for</span>(curIndex = <span class="number">0</span>; curIndex &lt; svrs.size(); ++curIndex) &#123;</span><br><span class="line">                mod = <span class="keyword">this</span>.getWeight((Server)svrs.get(curIndex));</span><br><span class="line">                maxWeight = Math.max(maxWeight, mod);</span><br><span class="line">                minWeight = Math.min(minWeight, mod);</span><br><span class="line">                <span class="keyword">if</span> (mod &gt; <span class="number">0</span>) &#123;</span><br><span class="line">                    weightMap.put(svrs.get(curIndex), <span class="keyword">new</span> RoundRobinRule.IntegerWrapper(mod));</span><br><span class="line">                    weightSum += mod;</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;</span><br><span class="line"> </span><br><span class="line">            curIndex = <span class="keyword">this</span>.nextIndexAI.getAndIncrement();</span><br><span class="line">            <span class="keyword">if</span> (maxWeight &gt; <span class="number">0</span> &amp;&amp; minWeight &lt; maxWeight) &#123;</span><br><span class="line">                mod = curIndex % weightSum;</span><br><span class="line"> </span><br><span class="line">                <span class="keyword">for</span>(<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; maxWeight; ++i) &#123;</span><br><span class="line">                    Iterator var11 = weightMap.entrySet().iterator();</span><br><span class="line"> </span><br><span class="line">                    <span class="keyword">while</span>(var11.hasNext()) &#123;</span><br><span class="line">                        Entry&lt;Server, RoundRobinRule.IntegerWrapper&gt; entry = (Entry)var11.next();</span><br><span class="line">                        Server svr = (Server)entry.getKey();</span><br><span class="line">                        RoundRobinRule.IntegerWrapper w = (RoundRobinRule.IntegerWrapper)entry.getValue();</span><br><span class="line">                        <span class="keyword">if</span> (mod == <span class="number">0</span> &amp;&amp; w.getValue() &gt; <span class="number">0</span>) &#123;</span><br><span class="line">                            <span class="keyword">return</span> svr;</span><br><span class="line">                        &#125;</span><br><span class="line"> </span><br><span class="line">                        <span class="keyword">if</span> (w.getValue() &gt; <span class="number">0</span>) &#123;</span><br><span class="line">                            w.decrement();</span><br><span class="line">                            --mod;</span><br><span class="line">                        &#125;</span><br><span class="line">                    &#125;</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;</span><br><span class="line"> </span><br><span class="line">            <span class="keyword">return</span> (Server)svrs.get(curIndex % svrs.size());</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"> </span><br><span class="line">    <span class="function"><span class="keyword">public</span> Server <span class="title">choose</span><span class="params">(Object key)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">return</span> <span class="keyword">this</span>.choose(<span class="keyword">this</span>.getLoadBalancer(), key);</span><br><span class="line">    &#125;</span><br><span class="line"> </span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">initWithNiwsConfig</span><span class="params">(IClientConfig clientConfig)</span> </span>&#123;</span><br><span class="line">    &#125;</span><br><span class="line"> </span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">final</span> <span class="class"><span class="keyword">class</span> <span class="title">IntegerWrapper</span> </span>&#123;</span><br><span class="line">        <span class="keyword">private</span> <span class="keyword">int</span> value;</span><br><span class="line"> </span><br><span class="line">        <span class="function"><span class="keyword">public</span> <span class="title">IntegerWrapper</span><span class="params">(<span class="keyword">int</span> value)</span> </span>&#123;</span><br><span class="line">            <span class="keyword">this</span>.value = value;</span><br><span class="line">        &#125;</span><br><span class="line"> </span><br><span class="line">        <span class="function"><span class="keyword">public</span> <span class="keyword">int</span> <span class="title">getValue</span><span class="params">()</span> </span>&#123;</span><br><span class="line">            <span class="keyword">return</span> <span class="keyword">this</span>.value;</span><br><span class="line">        &#125;</span><br><span class="line"> </span><br><span class="line">        <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">setValue</span><span class="params">(<span class="keyword">int</span> value)</span> </span>&#123;</span><br><span class="line">            <span class="keyword">this</span>.value = value;</span><br><span class="line">        &#125;</span><br><span class="line"> </span><br><span class="line">        <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">decrement</span><span class="params">()</span> </span>&#123;</span><br><span class="line">            --<span class="keyword">this</span>.value;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>负载均衡策略采用的经典的RoundRobin算法，举个例子，ABC三个实例，权重分别为3，3，2。那么这个算法会尽量生成ABCABCAB这样的调用序列。不过这个源码看着还是太绕了，我们干脆直接测试一下。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@Test</span></span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">run</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    Server s1 = <span class="keyword">new</span> Server(<span class="string">&quot;127.0.0.1&quot;</span>, <span class="number">1</span>);</span><br><span class="line">    s1.setAlive(<span class="keyword">true</span>);</span><br><span class="line">    s1.setWeight(<span class="number">100</span>);</span><br><span class="line">    Server s2 = <span class="keyword">new</span> Server(<span class="string">&quot;127.0.0.1&quot;</span>, <span class="number">2</span>);</span><br><span class="line">    s2.setAlive(<span class="keyword">true</span>);</span><br><span class="line">    s2.setWeight(<span class="number">100</span>);</span><br><span class="line">    Server s3 = <span class="keyword">new</span> Server(<span class="string">&quot;127.0.0.1&quot;</span>, <span class="number">3</span>);</span><br><span class="line">    s3.setAlive(<span class="keyword">true</span>);</span><br><span class="line">    s3.setWeight(<span class="number">50</span>);</span><br><span class="line"></span><br><span class="line">    RoundRobinRule rule = <span class="keyword">new</span> RoundRobinRule();</span><br><span class="line">    ILoadBalancer balance = <span class="keyword">new</span> BaseLoadBalancer(rule);</span><br><span class="line">    balance.addServers(Arrays.asList(s1, s2, s3));</span><br><span class="line"></span><br><span class="line">    Map&lt;Integer, Integer&gt; statics = <span class="keyword">new</span> HashMap&lt;&gt;();</span><br><span class="line">    <span class="keyword">for</span> (Server it : balance.getServerList(<span class="keyword">true</span>)) &#123;</span><br><span class="line">        statics.put(it.getPort(), <span class="number">0</span>);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">    <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; <span class="number">1000</span>; ++i) &#123;</span><br><span class="line">        Server chosen = rule.choose(balance, <span class="keyword">new</span> Object());</span><br><span class="line">        statics.computeIfPresent(chosen.getPort(), (k, v) -&gt; v + <span class="number">1</span>);</span><br><span class="line">        System.out.printf(<span class="string">&quot;第%d次, 调用统计: %s\n&quot;</span>, i, statics);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>结果如下：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br><span class="line">112</span><br><span class="line">113</span><br><span class="line">114</span><br><span class="line">115</span><br><span class="line">116</span><br><span class="line">117</span><br><span class="line">118</span><br><span class="line">119</span><br><span class="line">120</span><br><span class="line">121</span><br><span class="line">122</span><br><span class="line">123</span><br><span class="line">124</span><br><span class="line">125</span><br><span class="line">126</span><br><span class="line">127</span><br><span class="line">128</span><br><span class="line">129</span><br><span class="line">130</span><br><span class="line">131</span><br><span class="line">132</span><br><span class="line">133</span><br><span class="line">134</span><br><span class="line">135</span><br><span class="line">136</span><br><span class="line">137</span><br><span class="line">138</span><br><span class="line">139</span><br><span class="line">140</span><br><span class="line">141</span><br><span class="line">142</span><br><span class="line">143</span><br><span class="line">144</span><br><span class="line">145</span><br><span class="line">146</span><br><span class="line">147</span><br><span class="line">148</span><br><span class="line">149</span><br><span class="line">150</span><br><span class="line">151</span><br><span class="line">152</span><br><span class="line">153</span><br><span class="line">154</span><br><span class="line">155</span><br><span class="line">156</span><br><span class="line">157</span><br><span class="line">158</span><br><span class="line">159</span><br><span class="line">160</span><br><span class="line">161</span><br><span class="line">162</span><br><span class="line">163</span><br><span class="line">164</span><br><span class="line">165</span><br><span class="line">166</span><br><span class="line">167</span><br><span class="line">168</span><br><span class="line">169</span><br><span class="line">170</span><br><span class="line">171</span><br><span class="line">172</span><br><span class="line">173</span><br><span class="line">174</span><br><span class="line">175</span><br><span class="line">176</span><br><span class="line">177</span><br><span class="line">178</span><br><span class="line">179</span><br><span class="line">180</span><br><span class="line">181</span><br><span class="line">182</span><br><span class="line">183</span><br><span class="line">184</span><br><span class="line">185</span><br><span class="line">186</span><br><span class="line">187</span><br><span class="line">188</span><br><span class="line">189</span><br><span class="line">190</span><br><span class="line">191</span><br><span class="line">192</span><br><span class="line">193</span><br><span class="line">194</span><br><span class="line">195</span><br><span class="line">196</span><br><span class="line">197</span><br><span class="line">198</span><br><span class="line">199</span><br><span class="line">200</span><br><span class="line">201</span><br><span class="line">202</span><br><span class="line">203</span><br><span class="line">204</span><br><span class="line">205</span><br><span class="line">206</span><br><span class="line">207</span><br><span class="line">208</span><br><span class="line">209</span><br><span class="line">210</span><br><span class="line">211</span><br><span class="line">212</span><br><span class="line">213</span><br><span class="line">214</span><br><span class="line">215</span><br></pre></td><td class="code"><pre><span class="line">第0次, 调用统计: &#123;1=1, 2=0, 3=0&#125;</span><br><span class="line">第1次, 调用统计: &#123;1=1, 2=1, 3=0&#125;</span><br><span class="line">第2次, 调用统计: &#123;1=1, 2=1, 3=1&#125;</span><br><span class="line">第3次, 调用统计: &#123;1=2, 2=1, 3=1&#125;</span><br><span class="line">第4次, 调用统计: &#123;1=2, 2=2, 3=1&#125;</span><br><span class="line">第5次, 调用统计: &#123;1=2, 2=2, 3=2&#125;</span><br><span class="line">第6次, 调用统计: &#123;1=3, 2=2, 3=2&#125;</span><br><span class="line">第7次, 调用统计: &#123;1=3, 2=3, 3=2&#125;</span><br><span class="line">第8次, 调用统计: &#123;1=3, 2=3, 3=3&#125;</span><br><span class="line">第9次, 调用统计: &#123;1=4, 2=3, 3=3&#125;</span><br><span class="line">第10次, 调用统计: &#123;1=4, 2=4, 3=3&#125;</span><br><span class="line">第11次, 调用统计: &#123;1=4, 2=4, 3=4&#125;</span><br><span class="line">第12次, 调用统计: &#123;1=5, 2=4, 3=4&#125;</span><br><span class="line">第13次, 调用统计: &#123;1=5, 2=5, 3=4&#125;</span><br><span class="line">第14次, 调用统计: &#123;1=5, 2=5, 3=5&#125;</span><br><span class="line">第15次, 调用统计: &#123;1=6, 2=5, 3=5&#125;</span><br><span class="line">第16次, 调用统计: &#123;1=6, 2=6, 3=5&#125;</span><br><span class="line">第17次, 调用统计: &#123;1=6, 2=6, 3=6&#125;</span><br><span class="line">第18次, 调用统计: &#123;1=7, 2=6, 3=6&#125;</span><br><span class="line">第19次, 调用统计: &#123;1=7, 2=7, 3=6&#125;</span><br><span class="line">第20次, 调用统计: &#123;1=7, 2=7, 3=7&#125;</span><br><span class="line">第21次, 调用统计: &#123;1=8, 2=7, 3=7&#125;</span><br><span class="line">第22次, 调用统计: &#123;1=8, 2=8, 3=7&#125;</span><br><span class="line">第23次, 调用统计: &#123;1=8, 2=8, 3=8&#125;</span><br><span class="line">第24次, 调用统计: &#123;1=9, 2=8, 3=8&#125;</span><br><span class="line">第25次, 调用统计: &#123;1=9, 2=9, 3=8&#125;</span><br><span class="line">第26次, 调用统计: &#123;1=9, 2=9, 3=9&#125;</span><br><span class="line">第27次, 调用统计: &#123;1=10, 2=9, 3=9&#125;</span><br><span class="line">第28次, 调用统计: &#123;1=10, 2=10, 3=9&#125;</span><br><span class="line">第29次, 调用统计: &#123;1=10, 2=10, 3=10&#125;</span><br><span class="line">第30次, 调用统计: &#123;1=11, 2=10, 3=10&#125;</span><br><span class="line">第31次, 调用统计: &#123;1=11, 2=11, 3=10&#125;</span><br><span class="line">第32次, 调用统计: &#123;1=11, 2=11, 3=11&#125;</span><br><span class="line">第33次, 调用统计: &#123;1=12, 2=11, 3=11&#125;</span><br><span class="line">第34次, 调用统计: &#123;1=12, 2=12, 3=11&#125;</span><br><span class="line">第35次, 调用统计: &#123;1=12, 2=12, 3=12&#125;</span><br><span class="line">第36次, 调用统计: &#123;1=13, 2=12, 3=12&#125;</span><br><span class="line">第37次, 调用统计: &#123;1=13, 2=13, 3=12&#125;</span><br><span class="line">第38次, 调用统计: &#123;1=13, 2=13, 3=13&#125;</span><br><span class="line">第39次, 调用统计: &#123;1=14, 2=13, 3=13&#125;</span><br><span class="line">第40次, 调用统计: &#123;1=14, 2=14, 3=13&#125;</span><br><span class="line">第41次, 调用统计: &#123;1=14, 2=14, 3=14&#125;</span><br><span class="line">第42次, 调用统计: &#123;1=15, 2=14, 3=14&#125;</span><br><span class="line">第43次, 调用统计: &#123;1=15, 2=15, 3=14&#125;</span><br><span class="line">第44次, 调用统计: &#123;1=15, 2=15, 3=15&#125;</span><br><span class="line">第45次, 调用统计: &#123;1=16, 2=15, 3=15&#125;</span><br><span class="line">第46次, 调用统计: &#123;1=16, 2=16, 3=15&#125;</span><br><span class="line">第47次, 调用统计: &#123;1=16, 2=16, 3=16&#125;</span><br><span class="line">第48次, 调用统计: &#123;1=17, 2=16, 3=16&#125;</span><br><span class="line">第49次, 调用统计: &#123;1=17, 2=17, 3=16&#125;</span><br><span class="line">第50次, 调用统计: &#123;1=17, 2=17, 3=17&#125;</span><br><span class="line">第51次, 调用统计: &#123;1=18, 2=17, 3=17&#125;</span><br><span class="line">第52次, 调用统计: &#123;1=18, 2=18, 3=17&#125;</span><br><span class="line">第53次, 调用统计: &#123;1=18, 2=18, 3=18&#125;</span><br><span class="line">第54次, 调用统计: &#123;1=19, 2=18, 3=18&#125;</span><br><span class="line">第55次, 调用统计: &#123;1=19, 2=19, 3=18&#125;</span><br><span class="line">第56次, 调用统计: &#123;1=19, 2=19, 3=19&#125;</span><br><span class="line">第57次, 调用统计: &#123;1=20, 2=19, 3=19&#125;</span><br><span class="line">第58次, 调用统计: &#123;1=20, 2=20, 3=19&#125;</span><br><span class="line">第59次, 调用统计: &#123;1=20, 2=20, 3=20&#125;</span><br><span class="line">第60次, 调用统计: &#123;1=21, 2=20, 3=20&#125;</span><br><span class="line">第61次, 调用统计: &#123;1=21, 2=21, 3=20&#125;</span><br><span class="line">第62次, 调用统计: &#123;1=21, 2=21, 3=21&#125;</span><br><span class="line">第63次, 调用统计: &#123;1=22, 2=21, 3=21&#125;</span><br><span class="line">第64次, 调用统计: &#123;1=22, 2=22, 3=21&#125;</span><br><span class="line">第65次, 调用统计: &#123;1=22, 2=22, 3=22&#125;</span><br><span class="line">第66次, 调用统计: &#123;1=23, 2=22, 3=22&#125;</span><br><span class="line">第67次, 调用统计: &#123;1=23, 2=23, 3=22&#125;</span><br><span class="line">第68次, 调用统计: &#123;1=23, 2=23, 3=23&#125;</span><br><span class="line">第69次, 调用统计: &#123;1=24, 2=23, 3=23&#125;</span><br><span class="line">第70次, 调用统计: &#123;1=24, 2=24, 3=23&#125;</span><br><span class="line">第71次, 调用统计: &#123;1=24, 2=24, 3=24&#125;</span><br><span class="line">第72次, 调用统计: &#123;1=25, 2=24, 3=24&#125;</span><br><span class="line">第73次, 调用统计: &#123;1=25, 2=25, 3=24&#125;</span><br><span class="line">第74次, 调用统计: &#123;1=25, 2=25, 3=25&#125;</span><br><span class="line">第75次, 调用统计: &#123;1=26, 2=25, 3=25&#125;</span><br><span class="line">第76次, 调用统计: &#123;1=26, 2=26, 3=25&#125;</span><br><span class="line">第77次, 调用统计: &#123;1=26, 2=26, 3=26&#125;</span><br><span class="line">第78次, 调用统计: &#123;1=27, 2=26, 3=26&#125;</span><br><span class="line">第79次, 调用统计: &#123;1=27, 2=27, 3=26&#125;</span><br><span class="line">第80次, 调用统计: &#123;1=27, 2=27, 3=27&#125;</span><br><span class="line">第81次, 调用统计: &#123;1=28, 2=27, 3=27&#125;</span><br><span class="line">第82次, 调用统计: &#123;1=28, 2=28, 3=27&#125;</span><br><span class="line">第83次, 调用统计: &#123;1=28, 2=28, 3=28&#125;</span><br><span class="line">第84次, 调用统计: &#123;1=29, 2=28, 3=28&#125;</span><br><span class="line">第85次, 调用统计: &#123;1=29, 2=29, 3=28&#125;</span><br><span class="line">第86次, 调用统计: &#123;1=29, 2=29, 3=29&#125;</span><br><span class="line">第87次, 调用统计: &#123;1=30, 2=29, 3=29&#125;</span><br><span class="line">第88次, 调用统计: &#123;1=30, 2=30, 3=29&#125;</span><br><span class="line">第89次, 调用统计: &#123;1=30, 2=30, 3=30&#125;</span><br><span class="line">第90次, 调用统计: &#123;1=31, 2=30, 3=30&#125;</span><br><span class="line">第91次, 调用统计: &#123;1=31, 2=31, 3=30&#125;</span><br><span class="line">第92次, 调用统计: &#123;1=31, 2=31, 3=31&#125;</span><br><span class="line">第93次, 调用统计: &#123;1=32, 2=31, 3=31&#125;</span><br><span class="line">第94次, 调用统计: &#123;1=32, 2=32, 3=31&#125;</span><br><span class="line">第95次, 调用统计: &#123;1=32, 2=32, 3=32&#125;</span><br><span class="line">第96次, 调用统计: &#123;1=33, 2=32, 3=32&#125;</span><br><span class="line">第97次, 调用统计: &#123;1=33, 2=33, 3=32&#125;</span><br><span class="line">第98次, 调用统计: &#123;1=33, 2=33, 3=33&#125;</span><br><span class="line">第99次, 调用统计: &#123;1=34, 2=33, 3=33&#125;</span><br><span class="line">第100次, 调用统计: &#123;1=34, 2=34, 3=33&#125;</span><br><span class="line">。。。省略。。。</span><br><span class="line">第451次, 调用统计: &#123;1=176, 2=176, 3=100&#125;</span><br><span class="line">第452次, 调用统计: &#123;1=177, 2=176, 3=100&#125;</span><br><span class="line">第453次, 调用统计: &#123;1=177, 2=177, 3=100&#125;</span><br><span class="line">第454次, 调用统计: &#123;1=178, 2=177, 3=100&#125;</span><br><span class="line">第455次, 调用统计: &#123;1=178, 2=178, 3=100&#125;</span><br><span class="line">第456次, 调用统计: &#123;1=179, 2=178, 3=100&#125;</span><br><span class="line">第457次, 调用统计: &#123;1=179, 2=179, 3=100&#125;</span><br><span class="line">第458次, 调用统计: &#123;1=180, 2=179, 3=100&#125;</span><br><span class="line">第459次, 调用统计: &#123;1=180, 2=180, 3=100&#125;</span><br><span class="line">第460次, 调用统计: &#123;1=181, 2=180, 3=100&#125;</span><br><span class="line">第461次, 调用统计: &#123;1=181, 2=181, 3=100&#125;</span><br><span class="line">第462次, 调用统计: &#123;1=182, 2=181, 3=100&#125;</span><br><span class="line">第463次, 调用统计: &#123;1=182, 2=182, 3=100&#125;</span><br><span class="line">第464次, 调用统计: &#123;1=183, 2=182, 3=100&#125;</span><br><span class="line">第465次, 调用统计: &#123;1=183, 2=183, 3=100&#125;</span><br><span class="line">第466次, 调用统计: &#123;1=184, 2=183, 3=100&#125;</span><br><span class="line">第467次, 调用统计: &#123;1=184, 2=184, 3=100&#125;</span><br><span class="line">第468次, 调用统计: &#123;1=185, 2=184, 3=100&#125;</span><br><span class="line">第469次, 调用统计: &#123;1=185, 2=185, 3=100&#125;</span><br><span class="line">第470次, 调用统计: &#123;1=186, 2=185, 3=100&#125;</span><br><span class="line">第471次, 调用统计: &#123;1=186, 2=186, 3=100&#125;</span><br><span class="line">第472次, 调用统计: &#123;1=187, 2=186, 3=100&#125;</span><br><span class="line">第473次, 调用统计: &#123;1=187, 2=187, 3=100&#125;</span><br><span class="line">第474次, 调用统计: &#123;1=188, 2=187, 3=100&#125;</span><br><span class="line">第475次, 调用统计: &#123;1=188, 2=188, 3=100&#125;</span><br><span class="line">第476次, 调用统计: &#123;1=189, 2=188, 3=100&#125;</span><br><span class="line">第477次, 调用统计: &#123;1=189, 2=189, 3=100&#125;</span><br><span class="line">第478次, 调用统计: &#123;1=190, 2=189, 3=100&#125;</span><br><span class="line">第479次, 调用统计: &#123;1=190, 2=190, 3=100&#125;</span><br><span class="line">第480次, 调用统计: &#123;1=191, 2=190, 3=100&#125;</span><br><span class="line">第481次, 调用统计: &#123;1=191, 2=191, 3=100&#125;</span><br><span class="line">第482次, 调用统计: &#123;1=192, 2=191, 3=100&#125;</span><br><span class="line">第483次, 调用统计: &#123;1=192, 2=192, 3=100&#125;</span><br><span class="line">第484次, 调用统计: &#123;1=193, 2=192, 3=100&#125;</span><br><span class="line">第485次, 调用统计: &#123;1=193, 2=193, 3=100&#125;</span><br><span class="line">第486次, 调用统计: &#123;1=194, 2=193, 3=100&#125;</span><br><span class="line">第487次, 调用统计: &#123;1=194, 2=194, 3=100&#125;</span><br><span class="line">第488次, 调用统计: &#123;1=195, 2=194, 3=100&#125;</span><br><span class="line">第489次, 调用统计: &#123;1=195, 2=195, 3=100&#125;</span><br><span class="line">第490次, 调用统计: &#123;1=196, 2=195, 3=100&#125;</span><br><span class="line">第491次, 调用统计: &#123;1=196, 2=196, 3=100&#125;</span><br><span class="line">第492次, 调用统计: &#123;1=197, 2=196, 3=100&#125;</span><br><span class="line">第493次, 调用统计: &#123;1=197, 2=197, 3=100&#125;</span><br><span class="line">第494次, 调用统计: &#123;1=198, 2=197, 3=100&#125;</span><br><span class="line">第495次, 调用统计: &#123;1=198, 2=198, 3=100&#125;</span><br><span class="line">第496次, 调用统计: &#123;1=199, 2=198, 3=100&#125;</span><br><span class="line">第497次, 调用统计: &#123;1=199, 2=199, 3=100&#125;</span><br><span class="line">第498次, 调用统计: &#123;1=200, 2=199, 3=100&#125;</span><br><span class="line">第499次, 调用统计: &#123;1=200, 2=200, 3=100&#125;</span><br><span class="line">第500次, 调用统计: &#123;1=201, 2=200, 3=100&#125;</span><br><span class="line">第501次, 调用统计: &#123;1=201, 2=201, 3=100&#125;</span><br><span class="line">第502次, 调用统计: &#123;1=201, 2=201, 3=101&#125;</span><br><span class="line">第503次, 调用统计: &#123;1=202, 2=201, 3=101&#125;</span><br><span class="line">第504次, 调用统计: &#123;1=202, 2=202, 3=101&#125;</span><br><span class="line">第505次, 调用统计: &#123;1=202, 2=202, 3=102&#125;</span><br><span class="line">第506次, 调用统计: &#123;1=203, 2=202, 3=102&#125;</span><br><span class="line">第507次, 调用统计: &#123;1=203, 2=203, 3=102&#125;</span><br><span class="line">第508次, 调用统计: &#123;1=203, 2=203, 3=103&#125;</span><br><span class="line">第509次, 调用统计: &#123;1=204, 2=203, 3=103&#125;</span><br><span class="line">第510次, 调用统计: &#123;1=204, 2=204, 3=103&#125;</span><br><span class="line">第511次, 调用统计: &#123;1=204, 2=204, 3=104&#125;</span><br><span class="line">第512次, 调用统计: &#123;1=205, 2=204, 3=104&#125;</span><br><span class="line">第513次, 调用统计: &#123;1=205, 2=205, 3=104&#125;</span><br><span class="line">第514次, 调用统计: &#123;1=205, 2=205, 3=105&#125;</span><br><span class="line">第515次, 调用统计: &#123;1=206, 2=205, 3=105&#125;</span><br><span class="line">第516次, 调用统计: &#123;1=206, 2=206, 3=105&#125;</span><br><span class="line">第517次, 调用统计: &#123;1=206, 2=206, 3=106&#125;</span><br><span class="line">第518次, 调用统计: &#123;1=207, 2=206, 3=106&#125;</span><br><span class="line">第519次, 调用统计: &#123;1=207, 2=207, 3=106&#125;</span><br><span class="line">第520次, 调用统计: &#123;1=207, 2=207, 3=107&#125;</span><br><span class="line">第521次, 调用统计: &#123;1=208, 2=207, 3=107&#125;</span><br><span class="line">第522次, 调用统计: &#123;1=208, 2=208, 3=107&#125;</span><br><span class="line">第523次, 调用统计: &#123;1=208, 2=208, 3=108&#125;</span><br><span class="line">第524次, 调用统计: &#123;1=209, 2=208, 3=108&#125;</span><br><span class="line">第525次, 调用统计: &#123;1=209, 2=209, 3=108&#125;</span><br><span class="line">第526次, 调用统计: &#123;1=209, 2=209, 3=109&#125;</span><br><span class="line">第527次, 调用统计: &#123;1=210, 2=209, 3=109&#125;</span><br><span class="line">第528次, 调用统计: &#123;1=210, 2=210, 3=109&#125;</span><br><span class="line">第529次, 调用统计: &#123;1=210, 2=210, 3=110&#125;</span><br><span class="line">第530次, 调用统计: &#123;1=211, 2=210, 3=110&#125;</span><br><span class="line">第531次, 调用统计: &#123;1=211, 2=211, 3=110&#125;</span><br><span class="line">第532次, 调用统计: &#123;1=211, 2=211, 3=111&#125;</span><br><span class="line">第533次, 调用统计: &#123;1=212, 2=211, 3=111&#125;</span><br><span class="line">第534次, 调用统计: &#123;1=212, 2=212, 3=111&#125;</span><br><span class="line">第535次, 调用统计: &#123;1=212, 2=212, 3=112&#125;</span><br><span class="line">第536次, 调用统计: &#123;1=213, 2=212, 3=112&#125;</span><br><span class="line">第537次, 调用统计: &#123;1=213, 2=213, 3=112&#125;</span><br><span class="line">第538次, 调用统计: &#123;1=213, 2=213, 3=113&#125;</span><br><span class="line">第539次, 调用统计: &#123;1=214, 2=213, 3=113&#125;</span><br><span class="line">第540次, 调用统计: &#123;1=214, 2=214, 3=113&#125;</span><br><span class="line">第541次, 调用统计: &#123;1=214, 2=214, 3=114&#125;</span><br><span class="line">第542次, 调用统计: &#123;1=215, 2=214, 3=114&#125;</span><br><span class="line">第543次, 调用统计: &#123;1=215, 2=215, 3=114&#125;</span><br><span class="line">第544次, 调用统计: &#123;1=215, 2=215, 3=115&#125;</span><br><span class="line">第545次, 调用统计: &#123;1=216, 2=215, 3=115&#125;</span><br><span class="line">第546次, 调用统计: &#123;1=216, 2=216, 3=115&#125;</span><br><span class="line">。。。省略。。。</span><br><span class="line">第985次, 调用统计: &#123;1=393, 2=393, 3=200&#125;</span><br><span class="line">第986次, 调用统计: &#123;1=394, 2=393, 3=200&#125;</span><br><span class="line">第987次, 调用统计: &#123;1=394, 2=394, 3=200&#125;</span><br><span class="line">第988次, 调用统计: &#123;1=395, 2=394, 3=200&#125;</span><br><span class="line">第989次, 调用统计: &#123;1=395, 2=395, 3=200&#125;</span><br><span class="line">第990次, 调用统计: &#123;1=396, 2=395, 3=200&#125;</span><br><span class="line">第991次, 调用统计: &#123;1=396, 2=396, 3=200&#125;</span><br><span class="line">第992次, 调用统计: &#123;1=397, 2=396, 3=200&#125;</span><br><span class="line">第993次, 调用统计: &#123;1=397, 2=397, 3=200&#125;</span><br><span class="line">第994次, 调用统计: &#123;1=398, 2=397, 3=200&#125;</span><br><span class="line">第995次, 调用统计: &#123;1=398, 2=398, 3=200&#125;</span><br><span class="line">第996次, 调用统计: &#123;1=399, 2=398, 3=200&#125;</span><br><span class="line">第997次, 调用统计: &#123;1=399, 2=399, 3=200&#125;</span><br><span class="line">第998次, 调用统计: &#123;1=400, 2=399, 3=200&#125;</span><br><span class="line">第999次, 调用统计: &#123;1=400, 2=400, 3=200&#125;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+<p>最终调用比例的确达到了权重预设的比例，不过一开始是比较均衡的，权重并没有起到作用。感觉有问题？</p>
+<p>我转念一想，不对啊，这也不会导致pod之间流量不均匀啊。在对负载均衡模块经过又一轮查看后，没有找到问题所在，我几乎要放弃了。</p>
+<p>第二天与同事交流了这个问题，他说是不是给的权重或者别的就已经有问题了。这给了我一些启发，虽然最终答案与这没什么关系。我之前忽略的一点是问题只发生在发布时，而我过于关注负载均衡算法本身了，算法是没问题的，有问题的是来源。</p>
+<p>我们知道，重启服务会变更ip（大家应该都上容器了吧），同时会更新rpc注册中心的地址，注册中心又会通知消费者去更新订阅的服务列表。是不是更新这个逻辑有什么玄机？如下：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">private</span> <span class="keyword">void</span> <span class="title">refreshInvokers</span><span class="params">(<span class="keyword">final</span> List&lt;URL&gt; providerUrls)</span> </span>&#123;</span><br><span class="line">    <span class="keyword">if</span> (providerUrls != <span class="keyword">null</span> &amp;&amp; providerUrls.size() == <span class="number">1</span> &amp;&amp; providerUrls.get(<span class="number">0</span>) != <span class="keyword">null</span> &amp;&amp;</span><br><span class="line">            Constants.EMPTY_PROTOCOL.equals(providerUrls.get(<span class="number">0</span>).getProtocol())) &#123;</span><br><span class="line">        onEmptyProtocol();</span><br><span class="line">    &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">        <span class="keyword">if</span> (CollectionUtils.isEmpty(providerUrls)) &#123;</span><br><span class="line">            <span class="keyword">final</span> List&lt;URL&gt; localCached = <span class="keyword">this</span>.cachedProviderUrls;</span><br><span class="line">            <span class="keyword">if</span> (localCached != <span class="keyword">null</span>) &#123;</span><br><span class="line">                providerUrls.addAll(localCached);</span><br><span class="line">            &#125;</span><br><span class="line">        &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">            <span class="comment">// 注意这行</span></span><br><span class="line">            <span class="keyword">this</span>.cachedProviderUrls = providerUrls;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">final</span> ServiceParams svrCfg = <span class="keyword">new</span> ServiceParams();</span><br><span class="line">        <span class="keyword">final</span> Map&lt;ApiConfig, List&lt;ApiServer&gt;&gt; apiCaches = buildApiCache(providerUrls, svrCfg);</span><br><span class="line">        <span class="keyword">if</span> (apiCaches.size() &gt; <span class="number">0</span>) &#123;</span><br><span class="line">            <span class="keyword">final</span> ApiInvokerBuilder apiInvokerBuilder = <span class="keyword">new</span> ApiInvokerBuilder(<span class="keyword">this</span>);</span><br><span class="line">            <span class="keyword">final</span> UrlPrefixTree&lt;ApiInvoker&gt; cacheTree = <span class="keyword">new</span> UrlPrefixTree&lt;&gt;();</span><br><span class="line">            <span class="keyword">for</span> (<span class="keyword">final</span> Map.Entry&lt;ApiConfig, List&lt;ApiServer&gt;&gt; entry : apiCaches.entrySet()) &#123;</span><br><span class="line">                <span class="keyword">final</span> List&lt;ApiInvoker&gt; invokers = buildApiInvoker(entry.getKey(),</span><br><span class="line">                        entry.getValue(), svrCfg, apiInvokerBuilder);</span><br><span class="line">                <span class="keyword">for</span> (<span class="keyword">final</span> ApiInvoker invoker : invokers) &#123;</span><br><span class="line">                    cacheTree.addApiPattern(invoker);</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;</span><br><span class="line">          </span><br><span class="line">            <span class="keyword">final</span> UrlPrefixTree&lt;ApiInvoker&gt; oldPrefixTree = <span class="keyword">this</span>.prefixTree;</span><br><span class="line">            <span class="keyword">this</span>.prefixTree = cacheTree;</span><br><span class="line">            destroyAllInvokers(oldPrefixTree);</span><br><span class="line">            apiInvokerBuilder.resetAll();</span><br><span class="line">        &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">            <span class="keyword">final</span> UrlPrefixTree&lt;ApiInvoker&gt; oldPrefixTree = <span class="keyword">this</span>.prefixTree;</span><br><span class="line">            <span class="keyword">this</span>.prefixTree = <span class="keyword">null</span>;</span><br><span class="line">            destroyAllInvokers(oldPrefixTree);</span><br><span class="line">        &#125;</span><br><span class="line">        afterApiInvokerBuild(apiCaches);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>注意注释的那行，debug的过程中发现，每次有provider的变更，负载均衡都会重新使用新的订阅服务器列表，而每次从zookeeper拿的服务器列表顺序都是固定的。新起的pod，会放到list后面，前面的是先启动的pod。而从负载均衡算法看，第一次肯定是用列表第一个元素，也就是第一个pod，后面也是顺序轮训。所有在滚动重启或扩容的发布过程中，前几个的流量会相对高，pod变更的越多，差异越大。</p>
+<p>询问中间件的同学，他们认为这确实是一个问题，后续会改进负载均衡逻辑。事了拂衣去,深藏功与名～</p>
+
+
+                
+            </div>
+
+            <!-- Comments -->
+            
+                <div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1">
+                    <div id="gitalk-container"></div>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.css">
+<script src="https://cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.min.js"></script>
+<script>
+var gitalk = new Gitalk({
+  clientID: 'bfdcccffd65a099e0dd6',
+  clientSecret: '0e63b1d8f5fa09b4cf84c05ba3a03c993f9b0a5f',
+  repo: 'elliotloststh.github.io',
+  owner: 'elliotloststh',
+  admin: ['elliotloststh'],
+  id: location.pathname,      // Ensure uniqueness and length less than 50
+  distractionFreeMode: false  // Facebook-like distraction free mode
+})
+
+gitalk.render('gitalk-container')
+</script>
+
+
+
+
+
+
+
+
+
+                </div>
+            
+        </div>
+    </div>
+</article>
+
+    <!-- Footer -->
+    <hr />
+
+<!-- Footer -->
+<footer>
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1">
+                <ul class="list-inline text-center">
+                    
+
+                    
+
+                    
+                        <li>
+                            <a href="https://github.com/Elliotloststh" target="_blank">
+                                <span class="fa-stack fa-lg">
+                                    <i class="fa fa-circle fa-stack-2x"></i>
+                                    <i class="fa fa-github fa-stack-1x fa-inverse"></i>
+                                </span>
+                            </a>
+                        </li>
+                    
+
+                    
+
+                    
+                        <li>
+                            <a href="mailto:gary.yuan.jh@gmail.com" target="_blank">
+                                <span class="fa-stack fa-lg">
+                                    <i class="fa fa-circle fa-stack-2x"></i>
+                                    <i class="fa fa-envelope-o fa-stack-1x fa-inverse"></i>
+                                </span>
+                            </a>
+                        </li>
+                    
+                </ul>
+                <p class="copyright text-muted">&copy; 2022 Gary Yuan<br></p>
+            </div>
+        </div>
+    </div>
+</footer>
+
+
+    <!-- After footer scripts -->
+    
+<!-- jQuery -->
+<script src="//code.jquery.com/jquery-2.1.4.min.js"></script>
+
+<!-- Bootstrap -->
+<script src="//maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js"></script>
+
+<!-- Gallery -->
+<script src="/js/featherlight.min.js" type="text/javascript" charset="utf-8"></script>
+
+<!-- Disqus Comments -->
+
+
+
+<script type="text/x-mathjax-config">
+    MathJax.Hub.Config({
+        tex2jax: {
+            inlineMath: [ ["$","$"], ["\\(","\\)"] ],
+            skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code'],
+            processEscapes: true
+        }
+    });
+    MathJax.Hub.Queue(function() {
+        var all = MathJax.Hub.getAllJax();
+        for (var i = 0; i < all.length; ++i)
+            all[i].SourceElement().parentNode.className += ' has-jax';
+    });
+</script>
+<script src="//cdn.bootcss.com/mathjax/2.7.3/MathJax.js?config=TeX-MML-AM_CHTML"></script>
+</body>
+
+</html>
