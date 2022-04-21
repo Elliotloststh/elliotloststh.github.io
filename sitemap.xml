@@ -2,6 +2,15 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   
   <url>
+    <loc>http://myblackboxrecorder.com/solve_problem_use_bitmap/</loc>
+    
+    <lastmod>2022-04-21</lastmod>
+    
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  
+  <url>
     <loc>http://myblackboxrecorder.com/load-balance-keng/</loc>
     
     <lastmod>2022-04-18</lastmod>
@@ -101,15 +110,6 @@
   </url>
   
   <url>
-    <loc>http://myblackboxrecorder.com/solve_problem_use_bitmap/</loc>
-    
-    <lastmod>2022-01-04</lastmod>
-    
-    <changefreq>monthly</changefreq>
-    <priority>0.6</priority>
-  </url>
-  
-  <url>
     <loc>http://myblackboxrecorder.com/first_black_box/</loc>
     
     <lastmod>2021-12-29</lastmod>
@@ -130,7 +130,7 @@
 
   <url>
     <loc>http://myblackboxrecorder.com/</loc>
-    <lastmod>2022-04-18</lastmod>
+    <lastmod>2022-04-21</lastmod>
     <changefreq>daily</changefreq>
     <priority>1.0</priority>
   </url>
@@ -138,49 +138,49 @@
   
   <url>
     <loc>http://myblackboxrecorder.com/tags/%E6%8A%80%E6%9C%AF/</loc>
-    <lastmod>2022-04-18</lastmod>
+    <lastmod>2022-04-21</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.2</priority>
   </url>
   
   <url>
     <loc>http://myblackboxrecorder.com/tags/Java/</loc>
-    <lastmod>2022-04-18</lastmod>
+    <lastmod>2022-04-21</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.2</priority>
   </url>
   
   <url>
     <loc>http://myblackboxrecorder.com/tags/Sentinel/</loc>
-    <lastmod>2022-04-18</lastmod>
+    <lastmod>2022-04-21</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.2</priority>
   </url>
   
   <url>
     <loc>http://myblackboxrecorder.com/tags/%E6%9D%82%E8%B0%88/</loc>
-    <lastmod>2022-04-18</lastmod>
+    <lastmod>2022-04-21</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.2</priority>
   </url>
   
   <url>
     <loc>http://myblackboxrecorder.com/tags/%E7%BF%BB%E8%AF%91/</loc>
-    <lastmod>2022-04-18</lastmod>
+    <lastmod>2022-04-21</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.2</priority>
   </url>
   
   <url>
     <loc>http://myblackboxrecorder.com/tags/%E7%9F%A5%E8%A1%8C/</loc>
-    <lastmod>2022-04-18</lastmod>
+    <lastmod>2022-04-21</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.2</priority>
   </url>
   
   <url>
     <loc>http://myblackboxrecorder.com/tags/hexo/</loc>
-    <lastmod>2022-04-18</lastmod>
+    <lastmod>2022-04-21</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.2</priority>
   </url>
