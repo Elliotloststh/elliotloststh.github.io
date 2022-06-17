@@ -1,0 +1,474 @@
+<!DOCTYPE html>
+<html lang="zn-CN">
+
+<!-- Head tag -->
+<head>
+
+    <meta charset="utf-8"/>
+    <meta http-equiv="X-UA-Compatible" content="IE=edge"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1"/>
+
+    <!--Description-->
+
+    
+
+    
+        <meta name="description" content="近几个月，发生了不少的线上问题，好巧不巧基本都是我值班。一些问题其实十分典型，不是简单的代码批谬，code review也没第一时间注意到，这里做个记录。
+
+
+
+线上FullGC
+解决思路
+
+
+线上OOM
+解决思路
+
+
+Socket连接数异常
+解决思路
+
+
+接口响应异常
+如何读懂火焰图
+解决思路
+
+"/>
+    
+
+    <!--Author-->
+    
+        <meta name="author" content="Gary Yuan"/>
+    
+
+    <!--Open Graph Title-->
+    
+        <meta property="og:title" content="几个典型线上问题的排查与解决"/>
+    
+
+    <!--Open Graph Description-->
+    
+        <meta property="og:description" content="近几个月，发生了不少的线上问题，好巧不巧基本都是我值班。一些问题其实十分典型，不是简单的代码批谬，code review也没第一时间注意到，这里做个记录。
+
+
+
+线上FullGC
+解决思路
+
+
+线上OOM
+解决思路
+
+
+Socket连接数异常
+解决思路
+
+
+接口响应异常
+如何读懂火焰图
+解决思路
+
+"/>
+    
+
+    <!--Open Graph Site Name-->
+        <meta property="og:site_name" content="Gary&#39;s Blog"/>
+
+    <!--Type page-->
+    
+        <meta property="og:type" content="article"/>
+    
+
+    <!--Page Cover-->
+    
+    
+        <meta property="og:image" content="http://myblackboxrecorder.comhttps://myblackboxrecorder.oss-cn-hangzhou.aliyuncs.com/bg.jpg"/>
+    
+
+        <meta name="twitter:card" content="summary_large_image"/>
+
+    
+
+    
+        <meta name="twitter:image" content="http://myblackboxrecorder.comhttps://myblackboxrecorder.oss-cn-hangzhou.aliyuncs.com/bg.jpg"/>
+    
+
+    <!-- Title -->
+    
+    <title>几个典型线上问题的排查与解决 - Gary&#39;s Blog</title>
+
+    <!-- Bootstrap Core CSS -->
+    <link href="//maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css" rel="stylesheet"/>
+
+    <!-- Custom CSS -->
+    
+<link rel="stylesheet" href="/css/style.css">
+
+
+    <!-- Custom Fonts -->
+    <link href="//maxcdn.bootstrapcdn.com/font-awesome/4.6.3/css/font-awesome.min.css" rel="stylesheet" type="text/css"/>
+    <link href="//fonts.googleapis.com/css?family=Lora:400,700,400italic,700italic" rel="stylesheet" type="text/css"/>
+    <link href="//fonts.googleapis.com/css?family=Open+Sans:300italic,400italic,600italic,700italic,800italic,400,300,600,700,800" rel="stylesheet" type="text/css"/>
+
+    <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
+    <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+    <!--[if lt IE 9]>
+    <script src="//oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+    <script src="//oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
+    <![endif]-->
+    
+
+    <!-- Gallery -->
+    <link href="/css/featherlight.min.css" type="text/css" rel="stylesheet"/>
+
+    <!-- Google Analytics -->
+    
+
+
+    <!-- favicon -->
+    
+    <link rel="icon" href="https://myblackboxrecorder.oss-cn-hangzhou.aliyuncs.com/a049a-jooxb-001.ico"/>
+    
+
+<meta name="generator" content="Hexo 5.4.0"></head>
+
+
+<body>
+
+    <!-- Menu -->
+    <!-- Navigation -->
+<nav class="navbar navbar-default navbar-custom navbar-fixed-top">
+    <div class="container-fluid">
+        <!-- Brand and toggle get grouped for better mobile display -->
+        <div class="navbar-header page-scroll">
+            <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+            <a class="navbar-brand" href="/">Gary's Blog</a>
+        </div>
+
+        <!-- Collect the nav links, forms, and other content for toggling -->
+        <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+            <ul class="nav navbar-nav navbar-right">
+                
+                    <li>
+                        <a href="/">
+                            
+                                Home
+                            
+                        </a>
+                    </li>
+                
+                    <li>
+                        <a href="/archives">
+                            
+                                Archives
+                            
+                        </a>
+                    </li>
+                
+                    <li>
+                        <a href="/tags">
+                            
+                                Tags
+                            
+                        </a>
+                    </li>
+                
+                    <li>
+                        <a href="/about">
+                            
+                                about
+                            
+                        </a>
+                    </li>
+                
+            </ul>
+        </div>
+        <!-- /.navbar-collapse -->
+    </div>
+    <!-- /.container -->
+</nav>
+
+    <!-- Main Content -->
+    <!-- Page Header -->
+<!-- Set your background image for this header in your post front-matter: cover -->
+
+<header class="intro-header" style="background-image: url('https://myblackboxrecorder.oss-cn-hangzhou.aliyuncs.com/bg.jpg')">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1">
+                <div class="post-heading">
+                    <h1>几个典型线上问题的排查与解决</h1>
+                    
+                    <span class="meta">
+                        <!-- Date and Author -->
+                        
+                        
+                            2022-05-22
+                        
+                    </span>
+                </div>
+            </div>
+        </div>
+    </div>
+</header>
+
+<!-- Post Content -->
+<article>
+    <div class="container">
+        <div class="row">
+
+            <!-- Tags and categories -->
+           
+                <div class="col-lg-4 col-lg-offset-2 col-md-5 col-md-offset-1 post-tags">
+                    
+                        
+
+
+<a href="/tags/技术/">#技术</a> <a href="/tags/知行/">#知行</a>
+
+
+                    
+                </div>
+                <div class="col-lg-4 col-md-5 post-categories">
+                    
+                </div>
+            
+
+            <!-- Gallery -->
+            
+
+            <!-- Post Main Content -->
+            <div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1">
+                <blockquote>
+<p>近几个月，发生了不少的线上问题，好巧不巧基本都是我值班。一些问题其实十分典型，不是简单的代码批谬，code review也没第一时间注意到，这里做个记录。</p>
+</blockquote>
+<!-- toc -->
+<ul>
+<li><a href="#线上fullgc">线上FullGC</a><ul>
+<li><a href="#解决思路">解决思路</a></li>
+</ul>
+</li>
+<li><a href="#线上oom">线上OOM</a><ul>
+<li><a href="#解决思路-1">解决思路</a></li>
+</ul>
+</li>
+<li><a href="#socket连接数异常">Socket连接数异常</a><ul>
+<li><a href="#解决思路-2">解决思路</a></li>
+</ul>
+</li>
+<li><a href="#接口响应异常">接口响应异常</a><ul>
+<li><a href="#如何读懂火焰图">如何读懂火焰图</a></li>
+<li><a href="#解决思路-3">解决思路</a></li>
+</ul>
+</li>
+</ul>
+<!-- tocstop -->
+<hr>
+<h3><span id="线上fullgc">线上FullGC</span></h3><p>这个问题由来以久了，这个服务在过去很长一段时间内，都会发生偶发的fullgc，时间间隔不等，有连续fullgc的，也有一个月才fullgc一次的。之前另一位同学进行过初步的排查，因为公司范围内的经验就是大都由大方案引起的内存不足，他在查看之后也确定了是大方案的原因。并且因为我们本来就有对大方案优化的立项安排，所以一直对应fullgc问题的处理就是不影响服务本身就行。</p>
+<p>本着探究到底的原则，我还是进行了进一步的排查（其实是受不了报警了）。因为我们的方案数据是离散的，理论上不会有这么大的占用。于是在又一次fullgc后，我下载打开了dump下来的文件。</p>
+<div align="center">
+<img src="fullgc-1.png">
+</div>
+
+<p>很明显的看到一个100M的超大对象，其内容确实是方案数据，但其类型是char数组，那大概率是一个String。然后还有一个byte数组。业务代码中完全没有这两个对象的痕迹，于是我只能去其他地方找，最后发现问题出在加密与压缩的逻辑中。</p>
+<p>这边补充下，为了减少传输体大小，我们一些接口会进行压缩，同时为了保护公司核心数据资产，一些接口会进行加密。这两个逻辑写在一个自定义的MessageConverter中。</p>
+<p>例如写加密压缩数据时：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">return</span> <span class="keyword">new</span> EncryptCompressData(MAPPER.writeValueAsString(Result.ok(h5DesignData)));</span><br></pre></td></tr></table></figure>
+<p>会先序列化成字符串，然后包装成加密压缩类。之后在一个自定义的MessageConverter中进行处理</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@Override</span></span><br><span class="line"><span class="function"><span class="keyword">protected</span> <span class="keyword">void</span> <span class="title">writeInternal</span><span class="params">(<span class="keyword">final</span> EncryptCompressData encryptCompressData,</span></span></span><br><span class="line"><span class="params"><span class="function">        <span class="keyword">final</span> HttpOutputMessage httpOutputMessage)</span></span></span><br><span class="line"><span class="function">        <span class="keyword">throws</span> IOException, HttpMessageNotWritableException </span>&#123;</span><br><span class="line">    <span class="comment">// ...</span></span><br><span class="line">    <span class="keyword">if</span> (encryptCompressData.getBody() == <span class="keyword">null</span>) &#123;</span><br><span class="line">        httpOutputMessage.getHeaders().setContentLength(<span class="number">0L</span>);</span><br><span class="line">    &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">        <span class="keyword">try</span> &#123;</span><br><span class="line">            <span class="keyword">final</span> <span class="keyword">byte</span>[] bytes = CompressUtils.base64AfterGzip((</span><br><span class="line">                    encryptCompressData.getBody().getBytes(StandardCharsets.UTF_8)));</span><br><span class="line">            EncryptUtils.encrypt(bytes, key);</span><br><span class="line">            StreamUtils.copy(bytes, httpOutputMessage.getBody());</span><br><span class="line">        &#125; <span class="keyword">catch</span> (<span class="keyword">final</span> CompressorException e) &#123;</span><br><span class="line">            <span class="keyword">throw</span> <span class="keyword">new</span> IOException(e);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<ol>
+<li>将Controller返回的EncryptCompressData中的String转成byte数组</li>
+<li>调用CompressUtils.base64AfterGzip进行压缩</li>
+<li>调用EncryptUtils.encrypt进行加密</li>
+<li>调用StreamUtils.copy写入到输出流中</li>
+</ol>
+<p>读加密压缩数据则是</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@Override</span></span><br><span class="line"><span class="function"><span class="keyword">protected</span> EncryptCompressData <span class="title">readInternal</span><span class="params">(<span class="keyword">final</span> Class&lt;? extends EncryptCompressData&gt; aClass,</span></span></span><br><span class="line"><span class="params"><span class="function">        <span class="keyword">final</span> HttpInputMessage httpInputMessage)</span></span></span><br><span class="line"><span class="function">        <span class="keyword">throws</span> IOException, HttpMessageNotReadableException </span>&#123;</span><br><span class="line">    <span class="comment">// ...</span></span><br><span class="line">    <span class="keyword">final</span> <span class="keyword">byte</span>[] bytes = IOUtils.toByteArray(httpInputMessage.getBody());</span><br><span class="line">    EncryptUtils.decryptBytes(bytes, key);</span><br><span class="line">    <span class="keyword">try</span> &#123;</span><br><span class="line">        <span class="keyword">return</span> <span class="keyword">new</span> EncryptCompressData(<span class="keyword">new</span> String(CompressUtils.base64BeforeUngzip(bytes),</span><br><span class="line">                StandardCharsets.UTF_8));</span><br><span class="line">    &#125; <span class="keyword">catch</span> (<span class="keyword">final</span> CompressorException e) &#123;</span><br><span class="line">        <span class="keyword">throw</span> <span class="keyword">new</span> IOException(e);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>然后Controller拿到的就是一个字符串，可以自行反序列化。</p>
+<p>那么很明显就发现了中途会产生一个byte[]和一个String。当数据较大时，这两个对象，尤其是String字符对象占用内存会较大。</p>
+<h4><span id="解决思路">解决思路</span></h4><p>我们可以看到这几个过程都是端到端的，先把整个数据解密了，再把整个数据解压缩了，再把整个数据反序列化。因此会产生很多中间数据，</p>
+<p>解决方式是用流（Stream）来处理。需要处理的地方有：</p>
+<ul>
+<li>加密解密</li>
+<li>压缩解压缩</li>
+<li>序列化反序列化</li>
+</ul>
+<p>其中加密解密使用的是维吉尼亚加密法，简单来说就是把每一个byte用某种规则替换成另一个byte，因此虽然我不懂这个规则具体是啥，我也可以把它改成成流的，只需把端到端for循环里的逻辑改到Stream的read/write中去。</p>
+<p>压缩解压缩使用的base64+gzip加密，apache的二方包中本来就提供了流式的方法。</p>
+<p>序列化反序列化，jackson也提供了流失操作。</p>
+<p>那么，代码如下：</p>
+<p>定义新的包装类型替换EncryptData和EncryptCompressData，使用泛型</p>
+<p>为什么？因为原先必须显式地在Controller层处理序列化反序列化实在太不优雅，而且不方便使用流式api</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">CipherData</span>&lt;<span class="title">T</span>&gt; </span>&#123;</span><br><span class="line">    <span class="keyword">private</span> T content;</span><br><span class="line"> </span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="title">CipherData</span><span class="params">(T content)</span> </span>&#123;</span><br><span class="line">        set(content);</span><br><span class="line">    &#125;</span><br><span class="line"> </span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">set</span><span class="params">(T content)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">this</span>.content = content;</span><br><span class="line">    &#125;</span><br><span class="line"> </span><br><span class="line">    <span class="function"><span class="keyword">public</span> T <span class="title">get</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        <span class="keyword">return</span> content;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"> </span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">CipherCompressData</span>&lt;<span class="title">T</span>&gt; <span class="keyword">extends</span> <span class="title">CipherData</span>&lt;<span class="title">T</span>&gt;</span>&#123;</span><br><span class="line"> </span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="title">CipherCompressData</span><span class="params">(T content)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">super</span>(content);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>接下来，定义两个新的MessageConverter，处理这两种类。MessageConverter中调用流式接口处理InputStream或OutputStream。流失操作封装如下：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">CipherUtils</span> </span>&#123;</span><br><span class="line">    <span class="comment">// 使用单独的ObjectMapper</span></span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">final</span> ObjectMapper DEFAULT_MAPPER = <span class="keyword">new</span> ObjectMapper();</span><br><span class="line"> </span><br><span class="line">    <span class="keyword">static</span> &#123;</span><br><span class="line">        DEFAULT_MAPPER.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, <span class="keyword">false</span>);</span><br><span class="line">        DEFAULT_MAPPER.setSerializationInclusion(JsonInclude.Include.NON_NULL);</span><br><span class="line">        DEFAULT_MAPPER.configure(SerializationFeature.ORDER_MAP_ENTRIES_BY_KEYS, <span class="keyword">true</span>);</span><br><span class="line">    &#125;</span><br><span class="line"> </span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> &lt;T&gt; <span class="function">T <span class="title">readCipherValue</span><span class="params">(<span class="keyword">final</span> InputStream inputStream, <span class="keyword">final</span> <span class="keyword">byte</span>[] cipherKey,</span></span></span><br><span class="line"><span class="params"><span class="function">            <span class="keyword">final</span> Class&lt;T&gt; clazz)</span></span></span><br><span class="line"><span class="function">            <span class="keyword">throws</span> IOException </span>&#123;</span><br><span class="line">        <span class="keyword">try</span> (DecryptInputStream decryptedInput = <span class="keyword">new</span> DecryptInputStream(inputStream, cipherKey)) &#123;</span><br><span class="line">            <span class="keyword">return</span> DEFAULT_MAPPER.readValue(decryptedInput, clazz);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"> </span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> &lt;T&gt; <span class="function">T <span class="title">readCipherCompressValue</span><span class="params">(<span class="keyword">final</span> InputStream inputStream,</span></span></span><br><span class="line"><span class="params"><span class="function">            <span class="keyword">final</span> <span class="keyword">byte</span>[] cipherKey,</span></span></span><br><span class="line"><span class="params"><span class="function">            <span class="keyword">final</span> Class&lt;T&gt; clazz)</span></span></span><br><span class="line"><span class="function">            <span class="keyword">throws</span> IOException, CompressorException </span>&#123;</span><br><span class="line">        <span class="keyword">try</span> (</span><br><span class="line">                DecryptInputStream decryptedInput = <span class="keyword">new</span> DecryptInputStream(inputStream, cipherKey);</span><br><span class="line">                CompressorInputStream gzipInput =</span><br><span class="line">                        <span class="keyword">new</span> CompressorStreamFactory().createCompressorInputStream(</span><br><span class="line">                                CompressorStreamFactory.GZIP, <span class="keyword">new</span> Base64InputStream(decryptedInput))</span><br><span class="line">        ) &#123;</span><br><span class="line">            <span class="keyword">return</span> DEFAULT_MAPPER.readValue(gzipInput, clazz);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"> </span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">writeCipherValue</span><span class="params">(<span class="keyword">final</span> CipherData&lt;Object&gt; data,</span></span></span><br><span class="line"><span class="params"><span class="function">            <span class="keyword">final</span> <span class="keyword">byte</span>[] cipherKey, <span class="keyword">final</span> OutputStream outputStream)</span> <span class="keyword">throws</span> IOException </span>&#123;</span><br><span class="line">        <span class="keyword">try</span> (EncryptOutputStream encryptOutput = <span class="keyword">new</span> EncryptOutputStream(outputStream, cipherKey)) &#123;</span><br><span class="line">            DEFAULT_MAPPER.writeValue(encryptOutput, data.get());</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"> </span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">writeCipherCompressValue</span><span class="params">(<span class="keyword">final</span> CipherCompressData&lt;Object&gt; data,</span></span></span><br><span class="line"><span class="params"><span class="function">            <span class="keyword">final</span> <span class="keyword">byte</span>[] cipherKey, <span class="keyword">final</span> OutputStream outputStream)</span></span></span><br><span class="line"><span class="function">            <span class="keyword">throws</span> IOException, CompressorException </span>&#123;</span><br><span class="line">        <span class="keyword">try</span> (</span><br><span class="line">                EncryptOutputStream encryptOutput = <span class="keyword">new</span> EncryptOutputStream(outputStream,</span><br><span class="line">                        cipherKey);</span><br><span class="line">                CompressorOutputStream compressorOutput = <span class="keyword">new</span> CompressorStreamFactory()</span><br><span class="line">                        .createCompressorOutputStream(CompressorStreamFactory.GZIP,</span><br><span class="line">                                <span class="keyword">new</span> Base64OutputStream(encryptOutput, <span class="keyword">true</span>, -<span class="number">1</span>, <span class="keyword">null</span>))</span><br><span class="line"> </span><br><span class="line">        ) &#123;</span><br><span class="line">            DEFAULT_MAPPER.writeValue(compressorOutput, data.get());</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>至此，线上再也没有发生过fullgc。</p>
+<h3><span id="线上oom">线上OOM</span></h3><p>某天突然线上出现大量报警，五花八门，查看日志发现非常醒目的OutOfMemory字眼。基本可以断定为一次OOM引发的故障。首先处理是将异常的机器给隔离了，然后扩容一台。之后慢慢排查。</p>
+<p>第一思路是去看内存，有没有什么特别的，通过dump文件，没有什么异常，但是从较大占用的double、int等类型对象来看，经验上应该还是方案及几何数据的占用。</p>
+<p>继续通过jstack查看线程信息，搜索业务包名，发现异常，大量线程waiting在了下面代码（已脱敏）的第7行</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">final</span> CountDownLatch countDownLatch = <span class="keyword">new</span> CountDownLatch(list.size());</span><br><span class="line"><span class="keyword">for</span> (<span class="keyword">final</span> Object o : list) &#123;</span><br><span class="line">    <span class="keyword">final</span> MyStrategy strategy = factory.create(o);</span><br><span class="line">    <span class="keyword">final</span> MyRunnable runner = <span class="keyword">new</span> MyRunnable(strategy, countDownLatch);</span><br><span class="line">    executor.execute(runner);</span><br><span class="line">&#125;</span><br><span class="line">countDownLatch.await();</span><br></pre></td></tr></table></figure>
+<p>其中，MyRunnable里会执行一段代码，执行完毕或执行异常都会让countDwonLatch countDown，那么为什么还会阻塞在waiting呢？</p>
+<p>问题出在拒绝策略上，executor使用的就是AbortPolicy。因为突发的流量升高，导致超过了最大线程数，执行了拒绝策略，但是上层没有进行处理，也就是说，任务被拒绝了，但是没有countDown，因此线程一直waiting，这个线程会持有方案数据，慢慢达到内存限制，导致OOM。</p>
+<h4><span id="解决思路">解决思路</span></h4><p>因为这个代码是另一个敏捷组写的，我抛给了他们。不过解决方案其实很简单：</p>
+<ol>
+<li>可以上层catch Exception，也进行countDown操作</li>
+<li>可以自定义拒绝策略，将CountDownLatch传入，执行拒绝时进行countDown</li>
+<li>为了保险起见，可以让CountDownLatch的await有一个超时时间（但是这个业务不太好定，因为时间不好估算，其他常场景可以考虑）</li>
+</ol>
+<p>思考：还有一个本质问题其实是线程池满了，这就涉及到一个容量预估的问题，虽然大的业务上线都会进行压测并根据压测结果进行容量规划，但是一般的需求都是较为依赖k8s的自动扩缩容。但目前我们自动扩缩容的指标只有机器内存、cpu这些，对线程池打满这样较为业务的情况没有很好的应对措施。我目前的建议也只有采取较为悲观的策略，即调低扩容的阈值，机器能多不能少。</p>
+<h3><span id="socket连接数异常">Socket连接数异常</span></h3><p>某次灰度发布升阶段后线上报警socket连接数异常，我是第一次碰到这个报警。</p>
+<p>隔离回滚之后去异常机器执行netstat<code> </code>-ap，发现确实有很多连接，看来监控不是误报。随机选了一些ip去查来源，发现都是跟oss相关的。于是我想到一个事，之前公司内出过类似故障，因为公司提供的获取OSS方法是通过Factory来build的，每次build都会占用连接，所以这个client必须是单例的，不能每次操作临时build。去看了下上线变更代码，果然如此。</p>
+<p>但这里还有一些复杂因素，其实原先的client是注册成Bean的，但由于最近公司在迁云，api有一些变化，需要传入bucketName与ossType（是阿里云还是腾讯云）。所以我们负责的同学想当然的去每次临时build了。</p>
+<h4><span id="解决思路">解决思路</span></h4><p>听上去将client注册成Bean就可以了，但是有一个烦人的地方是不同的业务方bucketName都不一样，原先大不了大家约定一个，每个bucket一个bean。这次因为迁云周期很长，不少团队bucket还在变化，也就是一个动态的。那么这时候就需要去动态地注册这些bean了。</p>
+<p>代码如下：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@Component</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">CustomBeanManager</span> <span class="keyword">implements</span> <span class="title">ApplicationContextAware</span> </span>&#123;</span><br><span class="line">    <span class="keyword">private</span> ApplicationContext applicationContext;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">synchronized</span>  &lt;T&gt; <span class="function"><span class="keyword">void</span> <span class="title">putBean</span><span class="params">(String name, T object)</span> </span>&#123;</span><br><span class="line">        <span class="comment">// bean已存在</span></span><br><span class="line">        <span class="keyword">if</span> (applicationContext.containsBean(name)) &#123;</span><br><span class="line">            <span class="keyword">return</span>;</span><br><span class="line">        &#125;</span><br><span class="line">        ConfigurableApplicationContext context =</span><br><span class="line">                (ConfigurableApplicationContext) applicationContext;</span><br><span class="line">        DefaultListableBeanFactory factory = (DefaultListableBeanFactory) context.getBeanFactory();</span><br><span class="line">        factory.registerSingleton(name, object);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">public</span> &lt;T&gt; <span class="function">T <span class="title">getBean</span><span class="params">(String name, Class&lt;T&gt; clazz)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">if</span> (!applicationContext.containsBean(name)) &#123;</span><br><span class="line">            <span class="keyword">return</span> <span class="keyword">null</span>;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">return</span> applicationContext.getBean(name, clazz);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">public</span> &lt;T&gt; <span class="function">T <span class="title">getBean</span><span class="params">(String name, Class&lt;T&gt; clazz, Supplier&lt;T&gt; supplier)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">if</span> (!applicationContext.containsBean(name)) &#123;</span><br><span class="line">            T res = supplier.get();</span><br><span class="line">            putBean(name, res);</span><br><span class="line">            <span class="keyword">return</span> res;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">return</span> applicationContext.getBean(name, clazz);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">setApplicationContext</span><span class="params">(<span class="keyword">final</span> ApplicationContext applicationContext)</span></span></span><br><span class="line"><span class="function">            <span class="keyword">throws</span> BeansException </span>&#123;</span><br><span class="line">        <span class="keyword">this</span>.applicationContext = applicationContext;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>思路就是将BucketName与OssType组合成Bean的名称，如果不存在这个bean就创建，并放入Sring容器中，如果存在直接返回。需要注意的是上方代码是一个通用组件，创建OssClient的过程由业务方传入为supplier。</p>
+<h3><span id="接口响应异常">接口响应异常</span></h3><p>这个问题其实不是线上的，是在feature环境持续很久排查很久的，值的分享。</p>
+<p>背景是我们进行了一些架构的升级，数据结构的变更，因此翻新了一些接口。其中数据保存读取的接口耗时异常的慢，夸张到要10s才能读取，虽然数据也挺大的，有10M，但是这个时间也是不合理的。</p>
+<p>初期我们通过排查代码逻辑查看是否有问题，但没有发现明显异常，因为这个接口主要就是序列化反序列化，我们自己定义的序列化器又反复检查没有问题，所以我们一开始把原因归结为数据太大，因此序列化较慢，从debug记录的耗时看也是如此。不过后面再复盘的时候，考虑即使数据大，序列化也不应该消耗如此之久的时间。</p>
+<p>后续的排查依赖了<a target="_blank" rel="noopener" href="https://www.brendangregg.com/flamegraphs.html">火焰图</a>分析。具体是使用Arthas来生成火焰图。</p>
+<h4><span id="如何读懂火焰图">如何读懂火焰图</span></h4><div align="center">
+<img src="flame.PNG">
+</div>
+
+<ul>
+<li>每一列表示一个调用栈，每一格是一个函数</li>
+<li>纵轴表示了栈的深度，按调用顺序从下到上排序，最上方表示采样时正占用cpu的函数</li>
+<li>横轴表示采样数，长度越宽，表示这个函数耗时越长。横轴的顺序是按字典排序的，没有实际意义。</li>
+</ul>
+<p>要看接口耗时问题，基本就是去找有哪些函数占的格子特别的宽。</p>
+<h4><span id="解决思路">解决思路</span></h4><p>回到主题，上面的问题把火焰图生成并分析之后，终于发现了异常点。</p>
+<div align="center">
+<img src="flame-2.png">
+</div>
+
+<p>大量的时间耗在deserialize方法，deserialize方法中又是_findRootDeserializer占用大量耗时。</p>
+<p>该方法用于获取当前根类型的反序列化器。而ObjectMapper内设有缓存机制，用于缓存当前javaType对应的反序列化器，但此时缓存并未生效，且每次调用都要去构造反序列化器，调用栈底部在PlaneDeserializer类中，翻看代码继续分析</p>
+<div align="center">
+<img src="plane.png">
+</div>
+
+<p>每次都会去新建ObjectMapper，导致缓存机制失效，序列化反序列化耗时倍增。同时不只Plane这一个类，Math包下所有类几乎都是如此，因为Math是公司提供的几何基础包，我们保存的数据中包含大量的几何信息，导致了接口慢这个问题。</p>
+<p>至于为什么这样的基础包有问题却没发现，大概是因为只有数据量大的时候才能体现出来差异，同时我们又是公司内第一个保存大量几何数据的，让我们踩了这个坑。</p>
+<p>后续反馈给几何团队，升级包解决了问题。</p>
+
+
+                
+            </div>
+
+            <!-- Comments -->
+            
+                <div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1">
+                    <div id="gitalk-container"></div>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.css">
+<script src="https://cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.min.js"></script>
+<script>
+var gitalk = new Gitalk({
+  clientID: 'bfdcccffd65a099e0dd6',
+  clientSecret: '0e63b1d8f5fa09b4cf84c05ba3a03c993f9b0a5f',
+  repo: 'elliotloststh.github.io',
+  owner: 'elliotloststh',
+  admin: ['elliotloststh'],
+  id: location.pathname,      // Ensure uniqueness and length less than 50
+  distractionFreeMode: false  // Facebook-like distraction free mode
+})
+
+gitalk.render('gitalk-container')
+</script>
+
+
+
+
+
+
+
+
+
+                </div>
+            
+        </div>
+    </div>
+</article>
+
+    <!-- Footer -->
+    <hr />
+
+<!-- Footer -->
+<footer>
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1">
+                <ul class="list-inline text-center">
+                    
+
+                    
+
+                    
+                        <li>
+                            <a href="https://github.com/Elliotloststh" target="_blank">
+                                <span class="fa-stack fa-lg">
+                                    <i class="fa fa-circle fa-stack-2x"></i>
+                                    <i class="fa fa-github fa-stack-1x fa-inverse"></i>
+                                </span>
+                            </a>
+                        </li>
+                    
+
+                    
+
+                    
+                        <li>
+                            <a href="mailto:gary.yuan.jh@gmail.com" target="_blank">
+                                <span class="fa-stack fa-lg">
+                                    <i class="fa fa-circle fa-stack-2x"></i>
+                                    <i class="fa fa-envelope-o fa-stack-1x fa-inverse"></i>
+                                </span>
+                            </a>
+                        </li>
+                    
+                </ul>
+                <p class="copyright text-muted">&copy; 2022 Gary Yuan<br></p>
+            </div>
+        </div>
+    </div>
+</footer>
+
+
+    <!-- After footer scripts -->
+    
+<!-- jQuery -->
+<script src="//code.jquery.com/jquery-2.1.4.min.js"></script>
+
+<!-- Bootstrap -->
+<script src="//maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js"></script>
+
+<!-- Gallery -->
+<script src="/js/featherlight.min.js" type="text/javascript" charset="utf-8"></script>
+
+<!-- Disqus Comments -->
+
+
+
+<script type="text/x-mathjax-config">
+    MathJax.Hub.Config({
+        tex2jax: {
+            inlineMath: [ ["$","$"], ["\\(","\\)"] ],
+            skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code'],
+            processEscapes: true
+        }
+    });
+    MathJax.Hub.Queue(function() {
+        var all = MathJax.Hub.getAllJax();
+        for (var i = 0; i < all.length; ++i)
+            all[i].SourceElement().parentNode.className += ' has-jax';
+    });
+</script>
+<script src="//cdn.bootcss.com/mathjax/2.7.3/MathJax.js?config=TeX-MML-AM_CHTML"></script>
+</body>
+
+</html>
