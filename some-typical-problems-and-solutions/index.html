@@ -13,7 +13,7 @@
     
 
     
-        <meta name="description" content="近几个月，发生了不少的线上问题，好巧不巧基本都是我值班。一些问题其实十分典型，不是简单的代码批谬，code review也没第一时间注意到，这里做个记录。
+        <meta name="description" content="近几个月，发生了不少的线上问题，好巧不巧基本都是我值班。一些问题其实十分典型，不是简单的代码纰缪，code review也没第一时间注意到，这里做个记录。
 
 
 
@@ -48,7 +48,7 @@ Socket连接数异常
 
     <!--Open Graph Description-->
     
-        <meta property="og:description" content="近几个月，发生了不少的线上问题，好巧不巧基本都是我值班。一些问题其实十分典型，不是简单的代码批谬，code review也没第一时间注意到，这里做个记录。
+        <meta property="og:description" content="近几个月，发生了不少的线上问题，好巧不巧基本都是我值班。一些问题其实十分典型，不是简单的代码纰缪，code review也没第一时间注意到，这里做个记录。
 
 
 
@@ -245,7 +245,7 @@ Socket连接数异常
             <!-- Post Main Content -->
             <div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1">
                 <blockquote>
-<p>近几个月，发生了不少的线上问题，好巧不巧基本都是我值班。一些问题其实十分典型，不是简单的代码批谬，code review也没第一时间注意到，这里做个记录。</p>
+<p>近几个月，发生了不少的线上问题，好巧不巧基本都是我值班。一些问题其实十分典型，不是简单的代码纰缪，code review也没第一时间注意到，这里做个记录。</p>
 </blockquote>
 <!-- toc -->
 <ul>
@@ -322,13 +322,13 @@ Socket连接数异常
 </ol>
 <p>思考：还有一个本质问题其实是线程池满了，这就涉及到一个容量预估的问题，虽然大的业务上线都会进行压测并根据压测结果进行容量规划，但是一般的需求都是较为依赖k8s的自动扩缩容。但目前我们自动扩缩容的指标只有机器内存、cpu这些，对线程池打满这样较为业务的情况没有很好的应对措施。我目前的建议也只有采取较为悲观的策略，即调低扩容的阈值，机器能多不能少。</p>
 <h3><span id="socket连接数异常">Socket连接数异常</span></h3><p>某次灰度发布升阶段后线上报警socket连接数异常，我是第一次碰到这个报警。</p>
-<p>隔离回滚之后去异常机器执行netstat<code> </code>-ap，发现确实有很多连接，看来监控不是误报。随机选了一些ip去查来源，发现都是跟oss相关的。于是我想到一个事，之前公司内出过类似故障，因为公司提供的获取OSS方法是通过Factory来build的，每次build都会占用连接，所以这个client必须是单例的，不能每次操作临时build。去看了下上线变更代码，果然如此。</p>
+<p>`隔离回滚之后去异常机器执行netstat -ap，发现确实有很多连接，看来监控不是误报。随机选了一些ip去查来源，发现都是跟oss相关的。于是我想到一个事，之前公司内出过类似故障，因为公司提供的获取OSS方法是通过Factory来build的，每次build都会占用连接，所以这个client必须是单例的，不能每次操作临时build。去看了下上线变更代码，果然如此。</p>
 <p>但这里还有一些复杂因素，其实原先的client是注册成Bean的，但由于最近公司在迁云，api有一些变化，需要传入bucketName与ossType（是阿里云还是腾讯云）。所以我们负责的同学想当然的去每次临时build了。</p>
 <h4><span id="解决思路">解决思路</span></h4><p>听上去将client注册成Bean就可以了，但是有一个烦人的地方是不同的业务方bucketName都不一样，原先大不了大家约定一个，每个bucket一个bean。这次因为迁云周期很长，不少团队bucket还在变化，也就是一个动态的。那么这时候就需要去动态地注册这些bean了。</p>
 <p>代码如下：</p>
 <figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@Component</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">CustomBeanManager</span> <span class="keyword">implements</span> <span class="title">ApplicationContextAware</span> </span>&#123;</span><br><span class="line">    <span class="keyword">private</span> ApplicationContext applicationContext;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">synchronized</span>  &lt;T&gt; <span class="function"><span class="keyword">void</span> <span class="title">putBean</span><span class="params">(String name, T object)</span> </span>&#123;</span><br><span class="line">        <span class="comment">// bean已存在</span></span><br><span class="line">        <span class="keyword">if</span> (applicationContext.containsBean(name)) &#123;</span><br><span class="line">            <span class="keyword">return</span>;</span><br><span class="line">        &#125;</span><br><span class="line">        ConfigurableApplicationContext context =</span><br><span class="line">                (ConfigurableApplicationContext) applicationContext;</span><br><span class="line">        DefaultListableBeanFactory factory = (DefaultListableBeanFactory) context.getBeanFactory();</span><br><span class="line">        factory.registerSingleton(name, object);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">public</span> &lt;T&gt; <span class="function">T <span class="title">getBean</span><span class="params">(String name, Class&lt;T&gt; clazz)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">if</span> (!applicationContext.containsBean(name)) &#123;</span><br><span class="line">            <span class="keyword">return</span> <span class="keyword">null</span>;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">return</span> applicationContext.getBean(name, clazz);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">public</span> &lt;T&gt; <span class="function">T <span class="title">getBean</span><span class="params">(String name, Class&lt;T&gt; clazz, Supplier&lt;T&gt; supplier)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">if</span> (!applicationContext.containsBean(name)) &#123;</span><br><span class="line">            T res = supplier.get();</span><br><span class="line">            putBean(name, res);</span><br><span class="line">            <span class="keyword">return</span> res;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">return</span> applicationContext.getBean(name, clazz);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">setApplicationContext</span><span class="params">(<span class="keyword">final</span> ApplicationContext applicationContext)</span></span></span><br><span class="line"><span class="function">            <span class="keyword">throws</span> BeansException </span>&#123;</span><br><span class="line">        <span class="keyword">this</span>.applicationContext = applicationContext;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 <p>思路就是将BucketName与OssType组合成Bean的名称，如果不存在这个bean就创建，并放入Sring容器中，如果存在直接返回。需要注意的是上方代码是一个通用组件，创建OssClient的过程由业务方传入为supplier。</p>
-<h3><span id="接口响应异常">接口响应异常</span></h3><p>这个问题其实不是线上的，是在feature环境持续很久排查很久的，值的分享。</p>
+<h3><span id="接口响应异常">接口响应异常</span></h3><p>这个问题其实不是线上的，是在feature环境持续很久排查很久的，但也值的分享。</p>
 <p>背景是我们进行了一些架构的升级，数据结构的变更，因此翻新了一些接口。其中数据保存读取的接口耗时异常的慢，夸张到要10s才能读取，虽然数据也挺大的，有10M，但是这个时间也是不合理的。</p>
 <p>初期我们通过排查代码逻辑查看是否有问题，但没有发现明显异常，因为这个接口主要就是序列化反序列化，我们自己定义的序列化器又反复检查没有问题，所以我们一开始把原因归结为数据太大，因此序列化较慢，从debug记录的耗时看也是如此。不过后面再复盘的时候，考虑即使数据大，序列化也不应该消耗如此之久的时间。</p>
 <p>后续的排查依赖了<a target="_blank" rel="noopener" href="https://www.brendangregg.com/flamegraphs.html">火焰图</a>分析。具体是使用Arthas来生成火焰图。</p>
